@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+    packages = ["mlex_utils/**/*"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project]
+name = "mlex_utils"
+version = "0.0.1"
+description = "MLExchange Utils"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.11"
+
+# All dependencies are optional
+# Use pip install mlex_utils[all] to get everything
+dependencies = []
+
+[project.optional-dependencies]
+all = [
+    "prefect==2.14.21",
+]
+
+prefect = [
+    "prefect==2.14.21",
+]
+
+dev = [
+    "black==24.2.0",
+    "flake8==7.0.0",
+    "isort==5.13.2",
+    "pre-commit==3.6.2",
+    "pytest==8.1.1",
+]
