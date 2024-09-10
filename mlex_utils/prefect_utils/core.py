@@ -45,6 +45,17 @@ def schedule_prefect_flow(
     return flow_run_id
 
 
+async def _delete(
+    flow_run_id: str,
+):
+    async with get_client() as client:
+        await client.delete_flow_run(flow_run_id)
+
+
+def delete_flow_run(flow_run_id: str):
+    asyncio.run(_delete(flow_run_id))
+
+
 async def _get_name(flow_run_id):
     async with get_client() as client:
         flow_run = await client.read_flow_run(flow_run_id)
