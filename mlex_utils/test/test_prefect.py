@@ -35,14 +35,6 @@ def parent_flow(model_name):
     return parent_flow_run_id
 
 
-deployment = Deployment.build_from_flow(
-    flow=parent_flow,
-    name="test_deployment",
-    version="1",
-    tags=["Test tag"],
-)
-
-
 async def run_flow():
     async with get_client() as client:
         flow_run_id = await create_then_begin_flow_run(
@@ -58,6 +50,12 @@ async def run_flow():
 
 def test_schedule_prefect_flows():
     with prefect_test_harness():
+        deployment = Deployment.build_from_flow(
+            flow=parent_flow,
+            name="test_deployment",
+            version="1",
+            tags=["Test tag"],
+        )
         # Add deployment
         deployment.apply()
 
