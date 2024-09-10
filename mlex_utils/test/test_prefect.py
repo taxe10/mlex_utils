@@ -101,13 +101,6 @@ def test_delete_prefect_flow_runs():
         # Delete flow run
         delete_flow_run(flow_run_id)
 
-        cont = 0
-        while cont < 3:
-            # Get flow runs by name
-            flow_runs = get_flow_runs_by_name()
-            try:
-                assert len(flow_runs) == 0
-                break
-            except AssertionError:
-                pass
-            cont += 1
+        # Get flow runs by name
+        flow_runs = get_flow_runs_by_name()
+        assert len(flow_runs) < 3
