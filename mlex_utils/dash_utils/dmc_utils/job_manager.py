@@ -93,13 +93,18 @@ class JobManagerAIO(html.Div):
     ids = ids
 
     def __init__(
-        self, train_button_props=None, inference_button_props=None, aio_id=None
+        self,
+        train_button_props=None,
+        inference_button_props=None,
+        modal_props=None,
+        aio_id=None,
     ):
         """
         JobManagerAIO is an All-in-One component that is composed
         of a parent `html.Div` with a button to train and infer a model.
         - `train_button_props` - A dictionary of properties passed into the Button component for the train button.
         - `inference_button_props` - A dictionary of properties passed into the Button component for the inference button.
+        - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
         """
         if aio_id is None:
@@ -107,6 +112,7 @@ class JobManagerAIO(html.Div):
 
         train_button_props = self._update_button_props(train_button_props)
         inference_button_props = self._update_button_props(inference_button_props)
+        modal_props = self._update_modal_props(modal_props)
 
         super().__init__(
             [
@@ -204,8 +210,7 @@ class JobManagerAIO(html.Div):
                     title="Advanced Options",
                     children=AdvancedOptionsAIO(),
                     id=self.ids.advanced_options_modal(aio_id),
-                    style={"margin": "10px 10px 10px 250px"},
-                    opened=False,
+                    **modal_props,
                 ),
             ]
         )
@@ -221,6 +226,15 @@ class JobManagerAIO(html.Div):
             style if "style" not in button_props else button_props["style"]
         )
         return button_props
+
+    def _update_modal_props(
+        self, modal_props, style={"margin": "10px 10px 10px 250px"}, opened=False
+    ):
+        modal_props = modal_props.copy() if modal_props else {}
+        modal_props["style"] = (
+            style if "style" not in modal_props else modal_props["style"]
+        )
+        return modal_props
 
     @staticmethod
     @callback(
