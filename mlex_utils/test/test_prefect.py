@@ -7,6 +7,7 @@ from prefect.engine import create_then_begin_flow_run
 from prefect.testing.utilities import prefect_test_harness
 
 from mlex_utils.prefect_utils.core import (
+    cancel_flow_run,
     delete_flow_run,
     get_children_flow_run_ids,
     get_flow_run_name,
@@ -104,3 +105,22 @@ def test_delete_prefect_flow_runs():
         # Get flow runs by name
         flow_runs = get_flow_runs_by_name()
         assert len(flow_runs) < 3
+
+
+def test_cancel_prefect_flow_runs():
+    with prefect_test_harness():
+        # Run flow
+        flow_run_id = asyncio.run(run_flow())
+        assert isinstance(flow_run_id, str)
+
+        # Get flow runs by name
+        flow_runs = get_flow_runs_by_name()
+        assert len(flow_runs) == 3
+
+        # Cancel flow run
+        cancel_flow_run(flow_run_id)
+
+        # Check status in name
+        flow_run_name = get_flow_run_name(flow_run_id)
+        flow_run_label = get_flow_runs_by_name(flow_run_name)[0]["label"]
+        assert flow_run_label[0] == "🚫"

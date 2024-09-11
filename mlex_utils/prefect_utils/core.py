@@ -8,6 +8,7 @@ from prefect.client.schemas.filters import (
     FlowRunFilterParentFlowRunId,
     FlowRunFilterTags,
 )
+from prefect.client.schemas.objects import State, StateType
 
 
 async def _schedule(
@@ -56,19 +57,36 @@ def delete_flow_run(flow_run_id: str):
     asyncio.run(_delete(flow_run_id))
 
 
-async def _get_name(flow_run_id):
+async def _set_state(
+    flow_run_id: str,
+    state: StateType,
+    force: bool = False,
+):
+    async with get_client() as client:
+        await client.set_flow_run_state(flow_run_id, state, force=force)
+
+
+def cancel_flow_run(flow_run_id: str):
+    asyncio.run(_set_state(flow_run_id, State(type=StateType.CANCELLED)))
+
+
+async def _get_name(flow_run_id, is_completed):
     async with get_client() as client:
         flow_run = await client.read_flow_run(flow_run_id)
-        if flow_run.state.is_final():
+        if flow_run and not is_completed:
+            return flow_run.name
+        elif flow_run and flow_run.state.is_final():
             if flow_run.state.is_completed():
                 return flow_run.name
         return None
 
 
-# TODO: Get flow_run_id when the flow has not completed as well
-def get_flow_run_name(flow_run_id):
-    """Retrieves the name of the flow with the given id."""
-    return asyncio.run(_get_name(flow_run_id))
+def get_flow_run_name(flow_run_id, is_completed=False):
+    """
+    Retrieves the name of the flow with the given id.
+    If is_completed is True, it will return the name of the flow only  if it is completed.
+    """
+    return asyncio.run(_get_name(flow_run_id, is_completed))
 
 
 async def _flow_run_query(
