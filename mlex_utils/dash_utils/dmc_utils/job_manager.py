@@ -222,6 +222,7 @@ class JobManagerAIO(html.Div):
         )
         return button_props
 
+    @staticmethod
     @callback(
         Output(ids.advanced_options_modal(MATCH), "opened"),
         Input(ids.advanced_options_modal_train(MATCH), "n_clicks"),
