@@ -204,7 +204,7 @@ class JobManagerAIO(html.Div):
                     title="Advanced Options",
                     children=AdvancedOptionsAIO(),
                     id=self.ids.advanced_options_modal(aio_id),
-                    style={"margin": "10px 10px 10px 10px"},
+                    style={"margin": "10px 10px 10px 250px"},
                     opened=False,
                 ),
             ]
