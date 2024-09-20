@@ -1,21 +1,26 @@
+import uuid
+
 import dash_mantine_components as dmc
-from dash import Dash, html
+from dash import Dash, Input, Output, callback, html
 from dash_iconify import DashIconify
+from models_utils import Models
 
 from mlex_utils.dash_utils.dmc_utils.component_utils import (
-    ControlItem,
+    DmcControlItem as ControlItem,
+)
+from mlex_utils.dash_utils.dmc_utils.component_utils import (
     _accordion_item,
     _tooltip,
     drawer_section,
 )
-from mlex_utils.dash_utils.job_manager import get_job_manager_aio
+from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
-def layout():
+def layout(mlex_components, models):
     """
     Returns the layout for the control panel in the app UI
     """
-    job_manager = get_job_manager_aio("dmc")
+    job_manager = mlex_components.get_job_manager()
     return drawer_section(
         "MLExchange Utils Example with DMC",
         dmc.Stack(
@@ -173,7 +178,12 @@ def layout():
                                     "model-selector",
                                     dmc.Select(
                                         id="model-list",
-                                        data=[],
+                                        data=models.modelname_list,
+                                        value=(
+                                            models.modelname_list[0]
+                                            if models.modelname_list[0]
+                                            else None
+                                        ),
                                         placeholder="Select a model...",
                                     ),
                                 ),
@@ -190,12 +200,31 @@ def layout():
     )
 
 
+models = Models(modelfile_path="./examples/assets/models_dmc.json")
+mlex_components = MLExComponents("dmc")
+
 app = Dash(__name__)
 
 app.layout = dmc.MantineProvider(
     theme={"colorScheme": "light"},
-    children=layout(),
+    children=layout(mlex_components, models),
 )
+
+
+@callback(
+    Output("model-parameters", "children"),
+    Input("model-list", "value"),
+)
+def update_model_parameters(model_name):
+    model = models[model_name]
+    if model["gui_parameters"]:
+        item_list = mlex_components.get_parameter_items(
+            _id={"type": str(uuid.uuid4())}, json_blob=model["gui_parameters"]
+        )
+        return item_list
+    else:
+        return html.Div("Model has no parameters")
+
 
 if __name__ == "__main__":
     app.run_server(debug=True, port=8051)

@@ -1,13 +1,19 @@
+import uuid
+
 import dash_bootstrap_components as dbc
-from dash import Dash, dcc, html
+from dash import Dash, Input, Output, callback, dcc, html
+from models_utils import Models
 
-from mlex_utils.dash_utils.dbc_utils.component_utils import ControlItem, header
-from mlex_utils.dash_utils.job_manager import get_job_manager_aio
+from mlex_utils.dash_utils.dbc_utils.component_utils import (
+    DbcControlItem as ControlItem,
+)
+from mlex_utils.dash_utils.dbc_utils.component_utils import header
+from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
-def get_control_panel():
+def get_control_panel(mlex_components, models):
 
-    job_manager_aio = get_job_manager_aio(ui_style="dbc")
+    job_manager = mlex_components.get_job_manager()
 
     control_panel = dbc.Accordion(
         [
@@ -15,18 +21,20 @@ def get_control_panel():
                 [
                     ControlItem(
                         "Algorithm",
-                        "selec-algorithm",
+                        "select-algorithm",
                         dcc.Dropdown(
-                            id="algorithm-dropdown",
-                            options=[
-                                {"label": entry, "value": entry}
-                                for entry in ["PCA", "UMAP"]
-                            ],
-                            value="PCA",
+                            id="model-list",
+                            options=models.modelname_list,
+                            value=(
+                                models.modelname_list[0]
+                                if models.modelname_list[0]
+                                else None
+                            ),
                         ),
                     ),
+                    html.Div(id="model-parameters"),
                     html.P(),
-                    job_manager_aio,
+                    job_manager,
                 ],
                 title="Model Configuration",
             ),
@@ -37,6 +45,8 @@ def get_control_panel():
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+mlex_components = MLExComponents("dbc")
+models = Models(modelfile_path="./examples/assets/models_dbc.json")
 
 app.title = "Utils Example"
 app._favicon = "mlex.ico"
@@ -56,7 +66,7 @@ app.layout = html.Div(
                 dbc.Row(
                     [
                         dbc.Col(
-                            get_control_panel(),
+                            get_control_panel(mlex_components, models),
                             style={
                                 "display": "flex",
                                 "margin-top": "1em",
@@ -71,6 +81,22 @@ app.layout = html.Div(
         ),
     ],
 )
+
+
+@callback(
+    Output("model-parameters", "children"),
+    Input("model-list", "value"),
+)
+def update_model_parameters(model_name):
+    model = models[model_name]
+    if model["gui_parameters"]:
+        item_list = mlex_components.get_parameter_items(
+            _id={"type": str(uuid.uuid4())}, json_blob=model["gui_parameters"]
+        )
+        return item_list
+    else:
+        return html.Div("Model has no parameters")
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
