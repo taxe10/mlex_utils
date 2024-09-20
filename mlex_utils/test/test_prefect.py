@@ -11,7 +11,7 @@ from mlex_utils.prefect_utils.core import (
     delete_flow_run,
     get_children_flow_run_ids,
     get_flow_run_name,
-    get_flow_runs_by_name,
+    query_flow_runs,
     schedule_prefect_flow,
 )
 
@@ -77,7 +77,7 @@ def test_monitor_prefect_flow_runs():
         assert isinstance(flow_run_id, str)
 
         # Get flow runs by name
-        flow_runs = get_flow_runs_by_name()
+        flow_runs = query_flow_runs()
         assert len(flow_runs) == 3
 
         # Get flow run name
@@ -96,14 +96,14 @@ def test_delete_prefect_flow_runs():
         assert isinstance(flow_run_id, str)
 
         # Get flow runs by name
-        flow_runs = get_flow_runs_by_name()
+        flow_runs = query_flow_runs()
         assert len(flow_runs) == 3
 
         # Delete flow run
         delete_flow_run(flow_run_id)
 
         # Get flow runs by name
-        flow_runs = get_flow_runs_by_name()
+        flow_runs = query_flow_runs()
         assert len(flow_runs) < 3
 
 
@@ -114,7 +114,7 @@ def test_cancel_prefect_flow_runs():
         assert isinstance(flow_run_id, str)
 
         # Get flow runs by name
-        flow_runs = get_flow_runs_by_name()
+        flow_runs = query_flow_runs()
         assert len(flow_runs) == 3
 
         # Cancel flow run
@@ -122,5 +122,5 @@ def test_cancel_prefect_flow_runs():
 
         # Check status in name
         flow_run_name = get_flow_run_name(flow_run_id)
-        flow_run_label = get_flow_runs_by_name(flow_run_name)[0]["label"]
+        flow_run_label = query_flow_runs(flow_run_name)[0]["label"]
         assert flow_run_label[0] == "🚫"

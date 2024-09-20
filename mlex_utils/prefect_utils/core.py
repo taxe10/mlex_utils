@@ -109,8 +109,7 @@ async def _flow_run_query(
         return flow_runs
 
 
-# TODO: Change name to query_flow_runs because it takes both names and tags
-def get_flow_runs_by_name(flow_run_name=None, tags=None):
+def query_flow_runs(flow_run_name=None, tags=None):
     flow_runs_by_name = []
     flow_runs = asyncio.run(_flow_run_query(tags, flow_run_name=flow_run_name))
     for flow_run in flow_runs:
