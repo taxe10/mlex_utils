@@ -11,9 +11,7 @@ from mlex_utils.dash_utils.dbc_utils.component_utils import header
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
-def get_control_panel(mlex_components, models):
-
-    job_manager = mlex_components.get_job_manager()
+def get_control_panel(job_manager, models):
 
     control_panel = dbc.Accordion(
         [
@@ -44,10 +42,14 @@ def get_control_panel(mlex_components, models):
     return control_panel
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Get MLExchange dash components
 mlex_components = MLExComponents("dbc")
+job_manager = mlex_components.get_job_manager()
+
+# Get models
 models = Models(modelfile_path="./examples/assets/models_dbc.json")
 
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Utils Example"
 app._favicon = "mlex.ico"
 
@@ -66,7 +68,7 @@ app.layout = html.Div(
                 dbc.Row(
                     [
                         dbc.Col(
-                            get_control_panel(mlex_components, models),
+                            get_control_panel(job_manager, models),
                             style={
                                 "display": "flex",
                                 "margin-top": "1em",

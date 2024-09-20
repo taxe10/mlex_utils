@@ -16,11 +16,10 @@ from mlex_utils.dash_utils.dmc_utils.component_utils import (
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
-def layout(mlex_components, models):
+def layout(job_manager, models):
     """
     Returns the layout for the control panel in the app UI
     """
-    job_manager = mlex_components.get_job_manager()
     return drawer_section(
         "MLExchange Utils Example with DMC",
         dmc.Stack(
@@ -200,14 +199,17 @@ def layout(mlex_components, models):
     )
 
 
-models = Models(modelfile_path="./examples/assets/models_dmc.json")
+# Get MLExchange dash components
 mlex_components = MLExComponents("dmc")
+job_manager = mlex_components.get_job_manager()
+
+# Get models
+models = Models(modelfile_path="./examples/assets/models_dmc.json")
 
 app = Dash(__name__)
-
 app.layout = dmc.MantineProvider(
     theme={"colorScheme": "light"},
-    children=layout(mlex_components, models),
+    children=layout(job_manager, models),
 )
 
 
