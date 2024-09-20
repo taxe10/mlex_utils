@@ -4,24 +4,24 @@ import dash_mantine_components as dmc
 from dash import html
 
 
-class AdvancedOptionsAIO(html.Div):
+class DmcAdvancedOptionsAIO(html.Div):
 
     class ids:
 
         cancel_button = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DmcJobManagerAIO",
             "subcomponent": "cancel_button",
             "aio_id": aio_id,
         }
 
         delete_button = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DmcJobManagerAIO",
             "subcomponent": "delete_button",
             "aio_id": aio_id,
         }
 
         logs_area = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DmcJobManagerAIO",
             "subcomponent": "logs_area",
             "aio_id": aio_id,
         }

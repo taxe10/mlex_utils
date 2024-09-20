@@ -3,13 +3,13 @@ from dash import html
 from dash_iconify import DashIconify
 
 
-class ControlItem(dbc.Row):
+class DbcControlItem(dbc.Row):
     """
     Customized layout for a control item
     """
 
     def __init__(self, title, title_id, item, style={"width": "100%", "margin": "0px"}):
-        super(ControlItem, self).__init__(
+        super(DbcControlItem, self).__init__(
             children=[
                 dbc.Col(
                     dbc.Label(
@@ -18,7 +18,6 @@ class ControlItem(dbc.Row):
                         size="sm",
                         style={
                             "width": "100%",
-                            "height": "36px",
                             "align-content": "center",
                             "paddingRight": "5px",
                             "text-align": "right",

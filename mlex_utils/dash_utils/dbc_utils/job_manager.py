@@ -4,76 +4,76 @@ import dash_bootstrap_components as dbc
 from dash import MATCH, Input, Output, State, callback, dcc, html
 from dash_iconify import DashIconify
 
-from mlex_utils.dash_utils.dbc_utils.advanced_options import AdvancedOptionsAIO
-from mlex_utils.dash_utils.dbc_utils.component_utils import ControlItem
+from mlex_utils.dash_utils.dbc_utils.advanced_options import DbcAdvancedOptionsAIO
+from mlex_utils.dash_utils.dbc_utils.component_utils import DbcControlItem
 
 
-class JobManagerAIO(html.Div):
+class DbcJobManagerAIO(html.Div):
 
     class ids:
 
         job_name_title = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "job_name_title",
             "aio_id": aio_id,
         }
 
         job_name = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "job_name",
             "aio_id": aio_id,
         }
 
         train_button = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "train_button",
             "aio_id": aio_id,
         }
 
         train_dropdown_title = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "train_dropdown_title",
             "aio_id": aio_id,
         }
 
         train_dropdown = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "train_dropdown",
             "aio_id": aio_id,
         }
 
         advanced_options_modal_train = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "advanced_options_modal_train",
             "aio_id": aio_id,
         }
 
         inference_button = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "inference_button",
             "aio_id": aio_id,
         }
 
         inference_dropdown_title = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "inference_dropdown_title",
             "aio_id": aio_id,
         }
 
         inference_dropdown = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "inference_dropdown",
             "aio_id": aio_id,
         }
 
         advanced_options_modal_inference = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "advanced_options_modal_inference",
             "aio_id": aio_id,
         }
 
         advanced_options_modal = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "advanced_options_modal",
             "aio_id": aio_id,
         }
@@ -84,7 +84,7 @@ class JobManagerAIO(html.Div):
         self, train_button_props=None, inference_button_props=None, aio_id=None
     ):
         """
-        JobManagerAIO is an All-in-One component that is composed
+        DbcJobManagerAIO is an All-in-One component that is composed
         of a parent `html.Div` with a button to train and infer a model.
         - `train_button_props` - A dictionary of properties passed into the Button component for the train button.
         - `inference_button_props` - A dictionary of properties passed into the Button component for the inference button.
@@ -98,7 +98,7 @@ class JobManagerAIO(html.Div):
 
         super().__init__(
             [
-                ControlItem(
+                DbcControlItem(
                     "Name",
                     self.ids.job_name_title(aio_id),
                     dbc.Input(
@@ -113,7 +113,7 @@ class JobManagerAIO(html.Div):
                     "Train", id=self.ids.train_button(aio_id), **train_button_props
                 ),
                 html.Div(style={"height": "10px"}),
-                ControlItem(
+                DbcControlItem(
                     "Trained Jobs",
                     self.ids.train_dropdown_title(aio_id),
                     [
@@ -152,7 +152,7 @@ class JobManagerAIO(html.Div):
                     **inference_button_props,
                 ),
                 html.Div(style={"height": "10px"}),
-                ControlItem(
+                DbcControlItem(
                     "Inference Jobs",
                     self.ids.inference_dropdown_title(aio_id),
                     [
@@ -185,7 +185,7 @@ class JobManagerAIO(html.Div):
                 dbc.Modal(
                     [
                         dbc.ModalHeader("Advanced Options"),
-                        dbc.ModalBody(AdvancedOptionsAIO()),
+                        dbc.ModalBody(DbcAdvancedOptionsAIO()),
                     ],
                     id=self.ids.advanced_options_modal(aio_id),
                     style={"margin": "10px 10px 10px 10px"},

@@ -4,24 +4,24 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 
-class AdvancedOptionsAIO(html.Div):
+class DbcAdvancedOptionsAIO(html.Div):
 
     class ids:
 
         cancel_button = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "cancel_button",
             "aio_id": aio_id,
         }
 
         delete_button = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "delete_button",
             "aio_id": aio_id,
         }
 
         logs_area = lambda aio_id: {  # noqa: E731
-            "component": "JobManagerAIO",
+            "component": "DbcJobManagerAIO",
             "subcomponent": "logs_area",
             "aio_id": aio_id,
         }

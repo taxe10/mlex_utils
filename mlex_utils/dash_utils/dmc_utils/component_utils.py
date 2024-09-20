@@ -3,13 +3,13 @@ from dash import html
 from dash_iconify import DashIconify
 
 
-class ControlItem(dmc.Grid):
+class DmcControlItem(dmc.Grid):
     """
     Customized layout for a control item
     """
 
     def __init__(self, title, title_id, item, style={}):
-        super(ControlItem, self).__init__(
+        super(DmcControlItem, self).__init__(
             children=[
                 dmc.Text(
                     title,
