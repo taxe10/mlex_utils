@@ -1,7 +1,7 @@
 import uuid
 
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, callback, dcc, html
+from dash import Dash, Input, Output, callback, html
 from models_utils import Models
 
 from mlex_utils.dash_utils.dbc_utils.component_utils import (
@@ -12,7 +12,7 @@ from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
 def get_control_panel(job_manager, models):
-
+    model_list = [{"label": model, "value": model} for model in models.modelname_list]
     control_panel = dbc.Accordion(
         [
             dbc.AccordionItem(
@@ -20,12 +20,12 @@ def get_control_panel(job_manager, models):
                     ControlItem(
                         "Algorithm",
                         "select-algorithm",
-                        dcc.Dropdown(
+                        dbc.Select(
                             id="model-list",
-                            options=models.modelname_list,
+                            options=model_list,
                             value=(
-                                models.modelname_list[0]
-                                if models.modelname_list[0]
+                                model_list[0]["value"]
+                                if model_list[0]["value"]
                                 else None
                             ),
                         ),

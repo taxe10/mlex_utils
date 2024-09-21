@@ -93,7 +93,7 @@ class DbcDropdownItem(DbcControlItem):
         if param_key is None:
             param_key = name
 
-        self.input = dcc.Dropdown(
+        self.input = dbc.Select(
             id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
             **kwargs,
         )
