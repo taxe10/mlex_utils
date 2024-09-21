@@ -5,10 +5,10 @@ from dash import Dash, Input, Output, callback, html
 from dash_iconify import DashIconify
 from models_utils import Models
 
-from mlex_utils.dash_utils.dmc_utils.component_utils import (
+from mlex_utils.dash_utils.components_mantime.component_utils import (
     DmcControlItem as ControlItem,
 )
-from mlex_utils.dash_utils.dmc_utils.component_utils import (
+from mlex_utils.dash_utils.components_mantime.component_utils import (
     _accordion_item,
     _tooltip,
     drawer_section,

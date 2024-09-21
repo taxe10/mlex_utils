@@ -1,28 +1,24 @@
 import dash_bootstrap_components as dbc
-from dash import dcc
 
-from mlex_utils.dash_utils.dbc_utils.component_utils import DbcControlItem
+# TODO: Tentatively remove dbc.Form for mantime components
+import dash_mantine_components as dmc
+
+from mlex_utils.dash_utils.components_mantime.component_utils import DmcControlItem
 
 
-class DbcSimpleItem(DbcControlItem):
+class DmcNumberItem(DmcControlItem):
     def __init__(
         self,
         name,
         base_id,
-        item_type,
         title=None,
         param_key=None,
         visible=True,
-        debounce=True,
         **kwargs,
     ):
-
         if param_key is None:
             param_key = name
-
-        self.input = dbc.Input(
-            type=item_type,
-            debounce=debounce,
+        self.input = dmc.NumberInput(
             id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
             **kwargs,
         )
@@ -31,7 +27,7 @@ class DbcSimpleItem(DbcControlItem):
         if not visible:
             style["display"] = "none"
 
-        super(DbcSimpleItem, self).__init__(
+        super(DmcNumberItem, self).__init__(
             title=title,
             title_id={
                 **base_id,
@@ -44,27 +40,20 @@ class DbcSimpleItem(DbcControlItem):
         )
 
 
-class DbcNumberItem(DbcSimpleItem):
-    def __init__(self, *args, **kwargs):
-        super(DbcNumberItem, self).__init__(*args, item_type="number", **kwargs)
-
-
-class DbcStrItem(DbcSimpleItem):
-    def __init__(self, *args, **kwargs):
-        super(DbcStrItem, self).__init__(*args, item_type="text", **kwargs)
-
-
-class DbcSliderItem(DbcControlItem):
+class DmcStrItem(DmcControlItem):
     def __init__(
-        self, name, base_id, title=None, param_key=None, visible=True, **kwargs
+        self,
+        name,
+        base_id,
+        title=None,
+        param_key=None,
+        visible=True,
+        **kwargs,
     ):
-
         if param_key is None:
             param_key = name
-
-        self.input = dcc.Slider(
+        self.input = dmc.TextInput(
             id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
-            tooltip={"placement": "bottom", "always_visible": True},
             **kwargs,
         )
 
@@ -72,7 +61,7 @@ class DbcSliderItem(DbcControlItem):
         if not visible:
             style["display"] = "none"
 
-        super(DbcSliderItem, self).__init__(
+        super(DmcStrItem, self).__init__(
             title=title,
             title_id={
                 **base_id,
@@ -85,24 +74,31 @@ class DbcSliderItem(DbcControlItem):
         )
 
 
-class DbcDropdownItem(DbcControlItem):
+class DmcSliderItem(DmcControlItem):
     def __init__(
-        self, name, base_id, title=None, param_key=None, visible=True, **kwargs
+        self,
+        name,
+        base_id,
+        title=None,
+        param_key=None,
+        visible=True,
+        **kwargs,
     ):
-
         if param_key is None:
             param_key = name
-
-        self.input = dbc.Select(
+        self.input = dmc.Slider(
             id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
+            labelAlwaysOn=False,
+            color="gray",
+            size="sm",
             **kwargs,
         )
 
-        style = {"padding": "15px 0px 0px 0px"}
+        style = {"padding": "15px 0px 15px 0px"}
         if not visible:
             style["display"] = "none"
 
-        super(DbcDropdownItem, self).__init__(
+        super(DmcSliderItem, self).__init__(
             title=title,
             title_id={
                 **base_id,
@@ -115,15 +111,19 @@ class DbcDropdownItem(DbcControlItem):
         )
 
 
-class DbcRadioItem(DbcControlItem):
+class DmcDropdownItem(DmcControlItem):
     def __init__(
-        self, name, base_id, title=None, param_key=None, visible=True, **kwargs
+        self,
+        name,
+        base_id,
+        title=None,
+        param_key=None,
+        visible=True,
+        **kwargs,
     ):
-
         if param_key is None:
             param_key = name
-
-        self.input = dbc.RadioItems(
+        self.input = dmc.Select(
             id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
             **kwargs,
         )
@@ -132,7 +132,7 @@ class DbcRadioItem(DbcControlItem):
         if not visible:
             style["display"] = "none"
 
-        super(DbcRadioItem, self).__init__(
+        super(DmcDropdownItem, self).__init__(
             title=title,
             title_id={
                 **base_id,
@@ -145,19 +145,54 @@ class DbcRadioItem(DbcControlItem):
         )
 
 
-class DbcBoolItem(DbcControlItem):
+class DmcRadioItem(DmcControlItem):
     def __init__(
         self, name, base_id, title=None, param_key=None, visible=True, **kwargs
     ):
-
         if param_key is None:
             param_key = name
 
-        self.input = dbc.Switch(
+        options = [
+            dmc.Radio(option["label"], value=option["value"])
+            for option in kwargs["options"]
+        ]
+        kwargs.pop("options", None)
+        self.input = dmc.RadioGroup(
+            options,
+            id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
+            **kwargs,
+        )
+
+        style = {"padding": "15px 0px 0px 0px"}
+        if not visible:
+            style["display"] = "none"
+
+        super(DmcRadioItem, self).__init__(
+            title=title,
+            title_id={
+                **base_id,
+                "name": name,
+                "param_key": param_key,
+                "layer": "label",
+            },
+            item=self.input,
+            style=style,
+        )
+
+
+class DmcBoolItem(DmcControlItem):
+    def __init__(
+        self, name, base_id, title=None, param_key=None, visible=True, **kwargs
+    ):
+        if param_key is None:
+            param_key = name
+
+        self.input = dmc.Switch(
             id={**base_id, "name": name, "param_key": param_key, "layer": "input"},
             label=title,
-            label_style={"margin": "0px 0px 0px 0px"},
-            # input_style={"height": "36px"},
+            size="sm",
+            radius="lg",
+            color="gray",
             **kwargs,
         )
 
@@ -165,7 +200,7 @@ class DbcBoolItem(DbcControlItem):
         if not visible:
             style["display"] = "none"
 
-        super(DbcBoolItem, self).__init__(
+        super(DmcBoolItem, self).__init__(
             title="",  # title is already in the switch
             title_id={
                 **base_id,
@@ -178,19 +213,19 @@ class DbcBoolItem(DbcControlItem):
         )
 
 
-class DbcParameterItems(dbc.Form):
+class DmcParameterItems(dbc.Form):
     type_map = {
-        "float": DbcNumberItem,
-        "int": DbcNumberItem,
-        "str": DbcStrItem,
-        "slider": DbcSliderItem,
-        "dropdown": DbcDropdownItem,
-        "radio": DbcRadioItem,
-        "bool": DbcBoolItem,
+        "float": DmcNumberItem,
+        "int": DmcNumberItem,
+        "str": DmcStrItem,
+        "slider": DmcSliderItem,
+        "dropdown": DmcDropdownItem,
+        "radio": DmcRadioItem,
+        "bool": DmcBoolItem,
     }
 
     def __init__(self, _id, json_blob, values=None):
-        super(DbcParameterItems, self).__init__(id=_id, children=[])
+        super(DmcParameterItems, self).__init__(id=_id, children=[])
         self._json_blob = json_blob
         self.children = self.build_children(values=values)
 

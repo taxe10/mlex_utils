@@ -8,8 +8,13 @@ from mlex_utils.dash_utils.callbacks.manage_jobs import (
     _check_inference_job,
     _check_train_job,
 )
-from mlex_utils.dash_utils.dmc_utils.advanced_options import DmcAdvancedOptionsAIO
-from mlex_utils.dash_utils.dmc_utils.component_utils import DmcControlItem, _tooltip
+from mlex_utils.dash_utils.components_mantime.advanced_options import (
+    DmcAdvancedOptionsAIO,
+)
+from mlex_utils.dash_utils.components_mantime.component_utils import (
+    DmcControlItem,
+    _tooltip,
+)
 
 
 class DmcJobManagerAIO(html.Div):

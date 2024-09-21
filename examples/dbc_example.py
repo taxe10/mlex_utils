@@ -4,10 +4,10 @@ import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, callback, html
 from models_utils import Models
 
-from mlex_utils.dash_utils.dbc_utils.component_utils import (
+from mlex_utils.dash_utils.components_bootstrap.component_utils import (
     DbcControlItem as ControlItem,
 )
-from mlex_utils.dash_utils.dbc_utils.component_utils import header
+from mlex_utils.dash_utils.components_bootstrap.component_utils import header
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 

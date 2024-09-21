@@ -1,7 +1,7 @@
-from mlex_utils.dash_utils.dbc_utils.job_manager import DbcJobManagerAIO
-from mlex_utils.dash_utils.dbc_utils.parameter_items import DbcParameterItems
-from mlex_utils.dash_utils.dmc_utils.job_manager import DmcJobManagerAIO
-from mlex_utils.dash_utils.dmc_utils.parameter_items import DmcParameterItems
+from mlex_utils.dash_utils.components_bootstrap.job_manager import DbcJobManagerAIO
+from mlex_utils.dash_utils.components_bootstrap.parameter_items import DbcParameterItems
+from mlex_utils.dash_utils.components_mantime.job_manager import DmcJobManagerAIO
+from mlex_utils.dash_utils.components_mantime.parameter_items import DmcParameterItems
 
 
 class MLExComponents:

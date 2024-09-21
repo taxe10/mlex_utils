@@ -8,8 +8,10 @@ from mlex_utils.dash_utils.callbacks.manage_jobs import (
     _check_inference_job,
     _check_train_job,
 )
-from mlex_utils.dash_utils.dbc_utils.advanced_options import DbcAdvancedOptionsAIO
-from mlex_utils.dash_utils.dbc_utils.component_utils import DbcControlItem
+from mlex_utils.dash_utils.components_bootstrap.advanced_options import (
+    DbcAdvancedOptionsAIO,
+)
+from mlex_utils.dash_utils.components_bootstrap.component_utils import DbcControlItem
 
 
 class DbcJobManagerAIO(html.Div):
