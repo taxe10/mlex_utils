@@ -1,9 +1,13 @@
 import uuid
 
 import dash_mantine_components as dmc
-from dash import MATCH, Input, Output, State, callback, html
+from dash import MATCH, Input, Output, State, callback, dcc, html
 from dash_iconify import DashIconify
 
+from mlex_utils.dash_utils.callbacks.manage_jobs import (
+    _check_inference_job,
+    _check_train_job,
+)
 from mlex_utils.dash_utils.dmc_utils.advanced_options import DmcAdvancedOptionsAIO
 from mlex_utils.dash_utils.dmc_utils.component_utils import DmcControlItem, _tooltip
 
@@ -90,10 +94,24 @@ class DmcJobManagerAIO(html.Div):
             "aio_id": aio_id,
         }
 
+        check_job = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "check_job",
+            "aio_id": aio_id,
+        }
+
+        project_name_id = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "project_name_id",
+            "aio_id": aio_id,
+        }
+
     ids = ids
 
     def __init__(
         self,
+        prefect_tags=[],
+        mode="dev",
         train_button_props=None,
         inference_button_props=None,
         modal_props=None,
@@ -102,6 +120,8 @@ class DmcJobManagerAIO(html.Div):
         """
         DmcJobManagerAIO is an All-in-One component that is composed
         of a parent `html.Div` with a button to train and infer a model.
+        - `prefect_tags` - A list of tags used to filter Prefect flow runs.
+        - `mode` - The mode of the component. If "dev", the component will display sample data.
         - `train_button_props` - A dictionary of properties passed into the Button component for the train button.
         - `inference_button_props` - A dictionary of properties passed into the Button component for the inference button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
@@ -113,6 +133,9 @@ class DmcJobManagerAIO(html.Div):
         train_button_props = self._update_button_props(train_button_props)
         inference_button_props = self._update_button_props(inference_button_props)
         modal_props = self._update_modal_props(modal_props)
+
+        self._prefect_tags = prefect_tags
+        self._mode = mode
 
         super().__init__(
             [
@@ -212,8 +235,18 @@ class DmcJobManagerAIO(html.Div):
                     id=self.ids.advanced_options_modal(aio_id),
                     **modal_props,
                 ),
+                dcc.Interval(
+                    id=self.ids.check_job(aio_id),
+                    interval=5000,
+                ),
+                dcc.Store(
+                    id=self.ids.project_name_id(aio_id),
+                    data="",
+                ),
             ]
         )
+
+        self.register_callbacks()
 
     def _update_button_props(
         self, button_props, variant="light", style={"width": "100%", "margin": "5px"}
@@ -228,7 +261,7 @@ class DmcJobManagerAIO(html.Div):
         return button_props
 
     def _update_modal_props(
-        self, modal_props, style={"margin": "10px 10px 10px 250px"}, opened=False
+        self, modal_props, style={"margin": "10px 10px 10px 250px"}
     ):
         modal_props = modal_props.copy() if modal_props else {}
         modal_props["style"] = (
@@ -246,3 +279,24 @@ class DmcJobManagerAIO(html.Div):
     )
     def toggle_modal(n1, n2, opened):
         return not opened
+
+    def register_callbacks(self):
+
+        @callback(
+            Output(self.ids.train_dropdown(MATCH), "data"),
+            Input(self.ids.check_job(MATCH), "n_intervals"),
+        )
+        def check_train_job(n_intervals):
+            return _check_train_job(self._prefect_tags, self._mode)
+
+        @callback(
+            Output(self.ids.inference_dropdown(MATCH), "data"),
+            Output(self.ids.inference_dropdown(MATCH), "value"),
+            Input(self.ids.check_job(MATCH), "n_intervals"),
+            Input(self.ids.train_dropdown(MATCH), "value"),
+            State(self.ids.project_name_id(MATCH), "data"),
+        )
+        def check_inference_job(n_intervals, train_job_id, project_name):
+            return _check_inference_job(
+                train_job_id, project_name, self._prefect_tags, self._mode
+            )
