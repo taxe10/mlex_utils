@@ -5,21 +5,46 @@ from mlex_utils.dash_utils.components_mantime.parameter_items import DmcParamete
 
 
 class MLExComponents:
+    ALLOWED_UI_STYLES = {"dbc", "dmc"}
+    JOB_MANAGER_CLASSES = {"dbc": DbcJobManagerAIO, "dmc": DmcJobManagerAIO}
+    PARAMETER_ITEMS_CLASSES = {"dbc": DbcParameterItems, "dmc": DmcParameterItems}
+
     def __init__(self, ui_style):
-        if ui_style != "dbc" and ui_style != "dmc":
-            raise ValueError(f"ui_style must be one of ['dbc', 'dmc'], got {ui_style}")
+        if ui_style not in self.ALLOWED_UI_STYLES:
+            raise ValueError(
+                f"ui_style must be one of {self.ALLOWED_UI_STYLES}, got {ui_style}"
+            )
         self.ui_style = ui_style
 
     def get_job_manager(self, **kwargs):
-        if self.ui_style == "dbc":
-            job_manager = DbcJobManagerAIO(**kwargs)
-        else:
-            job_manager = DmcJobManagerAIO(**kwargs)
-        return job_manager
+        job_manager_class = self.JOB_MANAGER_CLASSES[self.ui_style]
+        return job_manager_class(**kwargs)
 
     def get_parameter_items(self, **kwargs):
-        if self.ui_style == "dbc":
-            parameter_items = DbcParameterItems(**kwargs)
-        else:
-            parameter_items = DmcParameterItems(**kwargs)
-        return parameter_items
+        parameter_items_class = self.PARAMETER_ITEMS_CLASSES[self.ui_style]
+        return parameter_items_class(**kwargs)
+
+    @staticmethod
+    def get_parameters_values(parameters):
+        """
+        Extracts parameters from the children component of a ParameterItems component,
+        if there are any errors in the input, it will return an error status
+        """
+        errors = False
+        input_params = {}
+        for param in parameters["props"]["children"]:
+            # param["props"]["children"][0] is the label
+            # param["props"]["children"][1] is the input
+            parameter_container = param["props"]["children"][1]
+            # The actual parameter item is the first and only child of the parameter container
+            parameter_item = parameter_container["props"]["children"]["props"]
+            key = parameter_item["id"]["param_key"]
+            if "value" in parameter_item:
+                value = parameter_item["value"]
+            elif "checked" in parameter_item:
+                value = parameter_item["checked"]
+            if "error" in parameter_item:
+                if parameter_item["error"] is not False:
+                    errors = True
+            input_params[key] = value
+        return input_params, errors
