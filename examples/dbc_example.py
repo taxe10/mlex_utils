@@ -75,7 +75,21 @@ app.layout = html.Div(
                                 "max-width": "450px",
                             },
                         ),
-                        dbc.Col(),
+                        dbc.Col(
+                            dbc.Card(
+                                children=[
+                                    dbc.CardHeader("Model Parameters"),
+                                    dbc.CardBody(
+                                        children=[
+                                            html.Div(
+                                                id="model-params-out",
+                                            )
+                                        ]
+                                    ),
+                                ],
+                                style={"margin-top": "1em"},
+                            ),
+                        ),
                     ]
                 ),
             ],
@@ -98,6 +112,17 @@ def update_model_parameters(model_name):
         return item_list
     else:
         return html.Div("Model has no parameters")
+
+
+@callback(
+    Output("model-params-out", "children"),
+    Input("model-parameters", "children"),
+)
+def update_model_parameters_output(model_parameter_container):
+    model_parameters, parameter_errors = mlex_components.get_parameters_values(
+        model_parameter_container
+    )
+    return str(model_parameters)
 
 
 if __name__ == "__main__":

@@ -209,7 +209,13 @@ models = Models(modelfile_path="./examples/assets/models_dmc.json")
 app = Dash(__name__)
 app.layout = dmc.MantineProvider(
     theme={"colorScheme": "light"},
-    children=layout(job_manager, models),
+    children=[
+        layout(job_manager, models),
+        html.Div(
+            id="model-params-out",
+            style={"margin-left": "450px"},
+        ),
+    ],
 )
 
 
@@ -226,6 +232,17 @@ def update_model_parameters(model_name):
         return item_list
     else:
         return html.Div("Model has no parameters")
+
+
+@callback(
+    Output("model-params-out", "children"),
+    Input("model-parameters", "children"),
+)
+def update_model_parameters_output(model_parameter_container):
+    model_parameters, parameter_errors = mlex_components.get_parameters_values(
+        model_parameter_container
+    )
+    return str(model_parameters)
 
 
 if __name__ == "__main__":
