@@ -67,6 +67,25 @@ model_parameters = [
 ]
 
 
+def serialize_dash_components(obj):
+    if hasattr(obj, "to_plotly_json"):
+        # Serialize the Dash component
+        serialized_obj = obj.to_plotly_json()
+        # Recursively process the serialized object's props
+        if isinstance(serialized_obj, dict) and "props" in serialized_obj:
+            serialized_obj["props"] = serialize_dash_components(serialized_obj["props"])
+        return serialized_obj
+    elif isinstance(obj, dict):
+        # Recursively process dictionary items
+        return {key: serialize_dash_components(value) for key, value in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        # Recursively process list or tuple items
+        return [serialize_dash_components(item) for item in obj]
+    else:
+        # Return the object as is (e.g., strings, numbers)
+        return obj
+
+
 @pytest.mark.parametrize("component_type", ["dbc", "dmc"])
 def test_get_job_manager(component_type):
     mlex_components = MLExComponents(component_type)
@@ -84,3 +103,6 @@ def test_get_parameters(component_type):
         _id={"type": str(uuid.uuid4())}, json_blob=model_parameters
     )
     assert parameters is not None
+    parameters = serialize_dash_components(parameters)
+    parameters_dict, params_errors = mlex_components.get_parameters_values(parameters)
+    assert isinstance(parameters_dict, dict) and params_errors is False
