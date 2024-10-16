@@ -11,22 +11,18 @@ class DbcControlItem(dbc.Row):
     def __init__(self, title, title_id, item, style={"width": "100%", "margin": "0px"}):
         super(DbcControlItem, self).__init__(
             children=[
-                dbc.Col(
-                    dbc.Label(
-                        title,
-                        id=title_id,
-                        size="sm",
-                        style={
-                            "width": "100%",
-                            "align-content": "center",
-                            "paddingRight": "5px",
-                            "text-align": "right",
-                        },
-                    ),
+                dbc.Label(
+                    title,
+                    id=title_id,
+                    size="sm",
+                    style={
+                        "width": "100%",
+                        "align-content": "center",
+                        "paddingRight": "5px",
+                        "text-align": "right",
+                    },
                 ),
-                dbc.Col(
-                    html.Div(item, style={"width": "265px"}),
-                ),
+                html.Div(item, style={"width": "265px"}),
             ],
             style=style,
             className="g-0",
