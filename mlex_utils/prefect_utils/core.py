@@ -7,8 +7,11 @@ from prefect.client.schemas.filters import (
     FlowRunFilterName,
     FlowRunFilterParentFlowRunId,
     FlowRunFilterTags,
+    LogFilter,
+    LogFilterFlowRunId,
 )
 from prefect.client.schemas.objects import State, StateType
+from prefect.client.schemas.sorting import LogSort
 
 
 async def _schedule(
@@ -109,6 +112,21 @@ async def _flow_run_query(
         return flow_runs
 
 
+async def read_flow_run_logs(flow_run_id, limit=200, offset=0):
+    async with get_client() as client:
+        flow_run_logs = await client.read_logs(
+            log_filter=LogFilter(
+                flow_run_id=LogFilterFlowRunId(
+                    any_=[flow_run_id],
+                ),
+            ),
+            limit=limit,
+            offset=offset,
+            sort=LogSort.TIMESTAMP_ASC,
+        )
+        return flow_run_logs
+
+
 def query_flow_runs(flow_run_name=None, tags=None):
     flow_runs_by_name = []
     flow_runs = asyncio.run(_flow_run_query(tags, flow_run_name=flow_run_name))
@@ -133,3 +151,8 @@ def get_children_flow_run_ids(parent_flow_run_id, sort="START_TIME_ASC"):
         str(children_flow_run.id) for children_flow_run in children_flow_runs
     ]
     return children_flow_run_ids
+
+
+def get_flow_run_logs(flow_run_id):
+    flow_run_logs = asyncio.run(read_flow_run_logs(flow_run_id))
+    return [log.message for log in flow_run_logs]
