@@ -1,12 +1,25 @@
 import uuid
 
 import dash_bootstrap_components as dbc
-from dash import MATCH, Input, Output, State, callback, dcc, html
+from dash import (
+    MATCH,
+    Input,
+    Output,
+    State,
+    callback,
+    callback_context,
+    dcc,
+    html,
+    no_update,
+)
 from dash_iconify import DashIconify
 
 from mlex_utils.dash_utils.callbacks.manage_jobs import (
+    _cancel_job,
     _check_inference_job,
     _check_train_job,
+    _delete_job,
+    _get_job_logs,
 )
 from mlex_utils.dash_utils.components_bootstrap.advanced_options import (
     DbcAdvancedOptionsAIO,
@@ -75,12 +88,6 @@ class DbcJobManagerAIO(html.Div):
         advanced_options_modal_inference = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
             "subcomponent": "advanced_options_modal_inference",
-            "aio_id": aio_id,
-        }
-
-        advanced_options_modal = lambda aio_id: {  # noqa: E731
-            "component": "DbcJobManagerAIO",
-            "subcomponent": "advanced_options_modal",
             "aio_id": aio_id,
         }
 
@@ -211,15 +218,7 @@ class DbcJobManagerAIO(html.Div):
                     ],
                 ),
                 html.Div(style={"height": "10px"}),
-                dbc.Modal(
-                    [
-                        dbc.ModalHeader("Advanced Options"),
-                        dbc.ModalBody(DbcAdvancedOptionsAIO()),
-                    ],
-                    id=self.ids.advanced_options_modal(aio_id),
-                    style={"margin": "10px 10px 10px 10px"},
-                    is_open=False,
-                ),
+                DbcAdvancedOptionsAIO(aio_id=aio_id),
                 dcc.Interval(
                     id=self.ids.check_job(aio_id),
                     interval=5000,
@@ -254,14 +253,63 @@ class DbcJobManagerAIO(html.Div):
 
     @staticmethod
     @callback(
-        Output(ids.advanced_options_modal(MATCH), "is_open"),
+        Output(
+            {
+                "aio_id": MATCH,
+                "component": "DbcAdvancedOptionsAIO",
+                "subcomponent": "advanced_options_modal",
+            },
+            "is_open",
+        ),
+        Output(
+            {
+                "aio_id": MATCH,
+                "component": "DbcAdvancedOptionsAIO",
+                "subcomponent": "job_id",
+            },
+            "data",
+        ),
         Input(ids.advanced_options_modal_train(MATCH), "n_clicks"),
         Input(ids.advanced_options_modal_inference(MATCH), "n_clicks"),
-        State(ids.advanced_options_modal(MATCH), "is_open"),
+        State(
+            {
+                "aio_id": MATCH,
+                "component": "DbcAdvancedOptionsAIO",
+                "subcomponent": "advanced_options_modal",
+            },
+            "is_open",
+        ),
+        State(ids.train_dropdown(MATCH), "value"),
+        State(ids.inference_dropdown(MATCH), "value"),
         prevent_initial_call=True,
     )
-    def toggle_modal(n1, n2, is_open):
-        return not is_open
+    def toggle_modal(n1, n2, is_open, train_job_id, inference_job_id):
+        button_id = callback_context.triggered[0]["prop_id"].split(".")[0]
+        if "train" in button_id:
+            job_id = train_job_id
+        else:
+            job_id = inference_job_id
+        return not is_open, job_id
+
+    @staticmethod
+    @callback(
+        Output(ids.advanced_options_modal_train(MATCH), "disabled"),
+        Input(ids.train_dropdown(MATCH), "value"),
+    )
+    def disable_advanced_train_options(train_job_id):
+        if train_job_id is not None:
+            return False
+        return True
+
+    @staticmethod
+    @callback(
+        Output(ids.advanced_options_modal_inference(MATCH), "disabled"),
+        Input(ids.inference_dropdown(MATCH), "value"),
+    )
+    def disable_advanced_inference_options(inference_job_id):
+        if inference_job_id is not None:
+            return False
+        return True
 
     def register_callbacks(self):
 
@@ -284,3 +332,106 @@ class DbcJobManagerAIO(html.Div):
             return _check_inference_job(
                 train_job_id, project_name, self._prefect_tags, self._mode
             )
+
+        @callback(
+            Output(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "advanced_options_modal",
+                },
+                "is_open",
+                allow_duplicate=True,
+            ),
+            Input(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "warning_confirm_cancel",
+                },
+                "n_clicks",
+            ),
+            State(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "job_id",
+                },
+                "data",
+            ),
+            prevent_initial_call=True,
+        )
+        def cancel_job(n_clicks, job_id):
+            _cancel_job(job_id, self._mode)
+            return False
+
+        @callback(
+            Output(self.ids.train_dropdown(MATCH), "value", allow_duplicate=True),
+            Output(self.ids.inference_dropdown(MATCH), "value", allow_duplicate=True),
+            Output(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "advanced_options_modal",
+                },
+                "is_open",
+                allow_duplicate=True,
+            ),
+            Input(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "warning_confirm_delete",
+                },
+                "n_clicks",
+            ),
+            State(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "job_id",
+                },
+                "data",
+            ),
+            State(self.ids.train_dropdown(MATCH), "value"),
+            State(self.ids.inference_dropdown(MATCH), "value"),
+            prevent_initial_call=True,
+        )
+        def delete_job(n_clicks, job_id, train_job_id, inference_job_id):
+            _delete_job(job_id, self._mode)
+            if job_id == train_job_id:
+                return None, no_update, False
+            return no_update, None, False
+
+        @callback(
+            Output(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "logs_area",
+                },
+                "children",
+            ),
+            Input(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "advanced_options_modal",
+                },
+                "is_open",
+            ),
+            Input(self.ids.check_job(MATCH), "n_intervals"),
+            State(
+                {
+                    "aio_id": MATCH,
+                    "component": "DbcAdvancedOptionsAIO",
+                    "subcomponent": "job_id",
+                },
+                "data",
+            ),
+            prevent_initial_call=True,
+        )
+        def get_logs(is_open, n_intervals, job_id):
+            if job_id is None:
+                return "No logs available"
+            return _get_job_logs(job_id, self._mode)
