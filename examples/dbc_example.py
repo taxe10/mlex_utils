@@ -44,7 +44,7 @@ def get_control_panel(job_manager, models):
 
 # Get MLExchange dash components
 mlex_components = MLExComponents("dbc")
-job_manager = mlex_components.get_job_manager()
+job_manager = mlex_components.get_job_manager(mode="real")
 
 # Get models
 models = Models(modelfile_path="./examples/assets/models_dbc.json")
