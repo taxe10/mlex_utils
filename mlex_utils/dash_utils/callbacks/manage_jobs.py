@@ -1,6 +1,12 @@
-from dash import no_update
+from dash import html, no_update
 
-from mlex_utils.prefect_utils.core import get_flow_run_name, query_flow_runs
+from mlex_utils.prefect_utils.core import (
+    cancel_flow_run,
+    delete_flow_run,
+    get_flow_run_logs,
+    get_flow_run_name,
+    query_flow_runs,
+)
 
 DEV_JOBS = [
     {"label": "❌ DLSIA ABC 03/11/2024 15:38PM", "value": "uid0001"},
@@ -44,3 +50,36 @@ def _check_inference_job(train_job_id, project_name, prefect_tags, mode):
                 selected_value = None if len(data) == 0 else no_update
             return data, selected_value
         return [], None
+
+
+def _get_job_logs(job_id, mode):
+    """
+    This callback retrieves the logs of the selected job from Prefect.
+    The logs are displayed in the logs textarea.
+    In "dev" mode, the logs are retrieved from the sample data above.
+    """
+    if mode == "dev":
+        return "Sample logs"
+    else:
+        logs = get_flow_run_logs(job_id)
+        return [item for pair in zip(logs, [html.Br()] * len(logs)) for item in pair][
+            :-1
+        ]
+
+
+def _cancel_job(job_id, mode):
+    """
+    This callback cancels the selected job in Prefect.
+    """
+    if mode != "dev":
+        cancel_flow_run(job_id)
+    pass
+
+
+def _delete_job(job_id, mode):
+    """
+    This callback deletes the selected job in Prefect.
+    """
+    if mode != "dev":
+        delete_flow_run(job_id)
+    pass
