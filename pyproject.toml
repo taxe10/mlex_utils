@@ -20,7 +20,7 @@ dependencies = []
 all = [
     "prefect==2.14.21",
     "dash==2.9.3",
-    "dash-bootstrap-components==1.0.2",
+    "dash-bootstrap-components==1.6.0",
     "dash-mantine-components==0.12.1",
     "dash-core-components==2.0.0",
     "dash-html-components==2.0.0",
@@ -35,7 +35,7 @@ prefect = [
 
 dash = [
     "dash==2.9.3",
-    "dash-bootstrap-components==1.0.2",
+    "dash-bootstrap-components==1.6.0",
     "dash-mantine-components==0.12.1",
     "dash-core-components==2.0.0",
     "dash-html-components==2.0.0",
