@@ -1,28 +1,77 @@
 import uuid
 
 import dash_mantine_components as dmc
-from dash import html
+from dash import MATCH, Input, Output, State, callback, dcc
+from dash_iconify import DashIconify
 
 
-class DmcAdvancedOptionsAIO(html.Div):
+class DmcAdvancedOptionsAIO(dmc.Modal):
 
     class ids:
 
+        advanced_options_modal = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "advanced_options_modal",
+            "aio_id": aio_id,
+        }
+
         cancel_button = lambda aio_id: {  # noqa: E731
-            "component": "DmcJobManagerAIO",
+            "component": "DmcAdvancedOptionsAIO",
             "subcomponent": "cancel_button",
             "aio_id": aio_id,
         }
 
         delete_button = lambda aio_id: {  # noqa: E731
-            "component": "DmcJobManagerAIO",
+            "component": "DmcAdvancedOptionsAIO",
             "subcomponent": "delete_button",
             "aio_id": aio_id,
         }
 
         logs_area = lambda aio_id: {  # noqa: E731
-            "component": "DmcJobManagerAIO",
+            "component": "DmcAdvancedOptionsAIO",
             "subcomponent": "logs_area",
+            "aio_id": aio_id,
+        }
+
+        job_id = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "job_id",
+            "aio_id": aio_id,
+        }
+
+        warning_delete_modal = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "warning_delete_modal",
+            "aio_id": aio_id,
+        }
+
+        warning_cancel_modal = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "warning_cancel_modal",
+            "aio_id": aio_id,
+        }
+
+        warning_confirm_delete = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "warning_confirm_delete",
+            "aio_id": aio_id,
+        }
+
+        warning_confirm_cancel = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "warning_confirm_cancel",
+            "aio_id": aio_id,
+        }
+
+        warning_undo_delete = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "warning_undo_delete",
+            "aio_id": aio_id,
+        }
+
+        warning_undo_cancel = lambda aio_id: {  # noqa: E731
+            "component": "DmcAdvancedOptionsAIO",
+            "subcomponent": "warning_undo_cancel",
             "aio_id": aio_id,
         }
 
@@ -50,7 +99,10 @@ class DmcAdvancedOptionsAIO(html.Div):
         delete_button_props = self._update_button_props(delete_button_props)
 
         super().__init__(
-            [
+            title="Advanced Options",
+            id=self.ids.advanced_options_modal(aio_id),
+            opened=False,
+            children=[
                 dmc.ScrollArea(
                     children=dmc.Paper(
                         [
@@ -62,27 +114,115 @@ class DmcAdvancedOptionsAIO(html.Div):
                         style={"width": "100%", "height": 200, "margin-bottom": "10px"},
                     ),
                 ),
-                dmc.Grid(
-                    [
-                        dmc.Col(
-                            dmc.Button(
-                                "Cancel Job",
-                                id=self.ids.cancel_button(aio_id),
-                                **cancel_button_props,
-                            ),
-                            span=6,
+                dmc.Accordion(
+                    children=[
+                        dmc.AccordionItem(
+                            [
+                                dmc.AccordionControl(
+                                    "Danger Zone",
+                                    icon=DashIconify(
+                                        icon="mdi:alert-circle",
+                                        # color=dmc.DEFAULT_THEME["colors"]["red"][6],
+                                        width=20,
+                                    ),
+                                ),
+                                dmc.AccordionPanel(
+                                    [
+                                        dmc.Grid(
+                                            [
+                                                dmc.Col(
+                                                    dmc.Button(
+                                                        "Cancel Job",
+                                                        id=self.ids.cancel_button(
+                                                            aio_id
+                                                        ),
+                                                        **cancel_button_props,
+                                                    ),
+                                                    span=6,
+                                                ),
+                                                dmc.Col(
+                                                    dmc.Button(
+                                                        "Delete Job",
+                                                        id=self.ids.delete_button(
+                                                            aio_id
+                                                        ),
+                                                        **delete_button_props,
+                                                    ),
+                                                    span=6,
+                                                ),
+                                            ]
+                                        ),
+                                    ],
+                                ),
+                            ],
+                            value="danger_zone",
                         ),
-                        dmc.Col(
-                            dmc.Button(
-                                "Delete Job",
-                                id=self.ids.delete_button(aio_id),
-                                **delete_button_props,
-                            ),
-                            span=6,
-                        ),
-                    ]
+                    ],
                 ),
-            ]
+                dcc.Store(id=self.ids.job_id(aio_id), data=None),
+                dmc.Modal(
+                    title="Warning",
+                    id=self.ids.warning_cancel_modal(aio_id),
+                    opened=False,
+                    children=[
+                        dmc.Text("Are you sure you want to cancel this job?"),
+                        dmc.Space(h=25),
+                        dmc.Grid(
+                            [
+                                dmc.Col(
+                                    dmc.Button(
+                                        "YES",
+                                        id=self.ids.warning_confirm_cancel(aio_id),
+                                        color="red",
+                                        style={"width": "100%", "margin": "5px"},
+                                    ),
+                                    span=6,
+                                ),
+                                dmc.Col(
+                                    dmc.Button(
+                                        "NO",
+                                        id=self.ids.warning_undo_cancel(aio_id),
+                                        style={"width": "100%", "margin": "5px"},
+                                    ),
+                                    span=6,
+                                ),
+                            ]
+                        ),
+                    ],
+                ),
+                dmc.Modal(
+                    title="Warning",
+                    id=self.ids.warning_delete_modal(aio_id),
+                    opened=False,
+                    children=[
+                        dmc.Text("Are you sure you want to delete this job?"),
+                        dmc.Space(h=25),
+                        dmc.Grid(
+                            [
+                                dmc.Col(
+                                    dmc.Button(
+                                        "YES",
+                                        id=self.ids.warning_confirm_delete(aio_id),
+                                        variant="light",
+                                        color="red",
+                                        style={"width": "100%", "margin": "5px"},
+                                    ),
+                                    span=6,
+                                ),
+                                dmc.Col(
+                                    dmc.Button(
+                                        "NO",
+                                        id=self.ids.warning_undo_delete(aio_id),
+                                        variant="light",
+                                        style={"width": "100%", "margin": "5px"},
+                                    ),
+                                    span=6,
+                                ),
+                            ]
+                        ),
+                    ],
+                ),
+            ],
         )
 
     def _update_button_props(
@@ -103,3 +243,37 @@ class DmcAdvancedOptionsAIO(html.Div):
             style if "style" not in button_props else button_props["style"]
         )
         return button_props
+
+    @staticmethod
+    @callback(
+        Output(ids.warning_cancel_modal(MATCH), "opened"),
+        Input(ids.cancel_button(MATCH), "n_clicks"),
+        Input(ids.warning_undo_cancel(MATCH), "n_clicks"),
+        Input(ids.warning_confirm_cancel(MATCH), "n_clicks"),
+        State(ids.warning_cancel_modal(MATCH), "opened"),
+        prevent_initial_call=True,
+    )
+    def toggle_warning_cancel_modal(
+        cancel_button_n_clicks,
+        undo_cancel_button_n_clicks,
+        confirm_cancel_button_n_clicks,
+        is_open,
+    ):
+        return not is_open
+
+    @staticmethod
+    @callback(
+        Output(ids.warning_delete_modal(MATCH), "opened"),
+        Input(ids.delete_button(MATCH), "n_clicks"),
+        Input(ids.warning_undo_delete(MATCH), "n_clicks"),
+        Input(ids.warning_confirm_delete(MATCH), "n_clicks"),
+        State(ids.warning_delete_modal(MATCH), "opened"),
+        prevent_initial_call=True,
+    )
+    def toggle_warning_delete_modal(
+        delete_button_n_clicks,
+        undo_delete_button_n_clicks,
+        confirm_delete_n_clicks,
+        is_open,
+    ):
+        return not is_open
