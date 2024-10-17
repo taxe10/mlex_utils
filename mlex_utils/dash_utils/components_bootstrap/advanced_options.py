@@ -1,28 +1,76 @@
 import uuid
 
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import MATCH, Input, Output, State, callback, dcc
 
 
-class DbcAdvancedOptionsAIO(html.Div):
+class DbcAdvancedOptionsAIO(dbc.Modal):
 
     class ids:
 
+        advanced_options_modal = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "advanced_options_modal",
+            "aio_id": aio_id,
+        }
+
         cancel_button = lambda aio_id: {  # noqa: E731
-            "component": "DbcJobManagerAIO",
+            "component": "DbcAdvancedOptionsAIO",
             "subcomponent": "cancel_button",
             "aio_id": aio_id,
         }
 
         delete_button = lambda aio_id: {  # noqa: E731
-            "component": "DbcJobManagerAIO",
+            "component": "DbcAdvancedOptionsAIO",
             "subcomponent": "delete_button",
             "aio_id": aio_id,
         }
 
         logs_area = lambda aio_id: {  # noqa: E731
-            "component": "DbcJobManagerAIO",
+            "component": "DbcAdvancedOptionsAIO",
             "subcomponent": "logs_area",
+            "aio_id": aio_id,
+        }
+
+        job_id = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "job_id",
+            "aio_id": aio_id,
+        }
+
+        warning_delete_modal = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "warning_delete_modal",
+            "aio_id": aio_id,
+        }
+
+        warning_cancel_modal = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "warning_cancel_modal",
+            "aio_id": aio_id,
+        }
+
+        warning_confirm_delete = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "warning_confirm_delete",
+            "aio_id": aio_id,
+        }
+
+        warning_confirm_cancel = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "warning_confirm_cancel",
+            "aio_id": aio_id,
+        }
+
+        warning_undo_delete = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "warning_undo_delete",
+            "aio_id": aio_id,
+        }
+
+        warning_undo_cancel = lambda aio_id: {  # noqa: E731
+            "component": "DbcAdvancedOptionsAIO",
+            "subcomponent": "warning_undo_cancel",
             "aio_id": aio_id,
         }
 
@@ -51,31 +99,86 @@ class DbcAdvancedOptionsAIO(html.Div):
         )
 
         super().__init__(
-            [
-                html.H6(
-                    id=self.ids.logs_area(aio_id),
-                    children="These are the logs...",
-                    style={"width": "100%", "height": 200, "margin-bottom": "10px"},
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dbc.Button(
-                                "Cancel Job",
-                                id=self.ids.cancel_button(aio_id),
-                                **cancel_button_props,
-                            )
+            id=self.ids.advanced_options_modal(aio_id),
+            children=[
+                dbc.ModalHeader("Advanced Options"),
+                dbc.ModalBody(id=self.ids.logs_area(aio_id)),
+                dbc.ModalFooter(
+                    dbc.Accordion(
+                        dbc.AccordionItem(
+                            title="Danger Zone",
+                            children=dbc.Row(
+                                [
+                                    dbc.Col(
+                                        dbc.Button(
+                                            "Cancel Job",
+                                            id=self.ids.cancel_button(aio_id),
+                                            **cancel_button_props,
+                                        ),
+                                    ),
+                                    dbc.Col(
+                                        dbc.Button(
+                                            "Delete Job",
+                                            id=self.ids.delete_button(aio_id),
+                                            **delete_button_props,
+                                        ),
+                                    ),
+                                ],
+                            ),
                         ),
-                        dbc.Col(
-                            dbc.Button(
-                                "Delete Job",
-                                id=self.ids.delete_button(aio_id),
-                                **delete_button_props,
-                            )
-                        ),
-                    ]
+                        start_collapsed=True,
+                        flush=True,
+                        style={"width": "100%", "--bs-accordion-active-bg": "#ffb3b3"},
+                    ),
                 ),
-            ]
+                dcc.Store(id=self.ids.job_id(aio_id), data=None),
+                dbc.Modal(
+                    id=self.ids.warning_cancel_modal(aio_id),
+                    children=[
+                        dbc.ModalHeader("Warning"),
+                        dbc.ModalBody("Are you sure you want to cancel this job?"),
+                        dbc.ModalFooter(
+                            [
+                                dbc.Button(
+                                    "YES",
+                                    id=self.ids.warning_confirm_cancel(aio_id),
+                                    color="danger",
+                                    className="ml-auto",
+                                ),
+                                dbc.Button(
+                                    "NO",
+                                    id=self.ids.warning_undo_cancel(aio_id),
+                                    className="ml-auto",
+                                ),
+                            ]
+                        ),
+                    ],
+                ),
+                dbc.Modal(
+                    id=self.ids.warning_delete_modal(aio_id),
+                    children=[
+                        dbc.ModalHeader("Warning"),
+                        dbc.ModalBody("Are you sure you want to delete this job?"),
+                        dbc.ModalFooter(
+                            [
+                                dbc.Button(
+                                    "YES",
+                                    id=self.ids.warning_confirm_delete(aio_id),
+                                    color="danger",
+                                    className="ml-auto",
+                                ),
+                                dbc.Button(
+                                    "NO",
+                                    id=self.ids.warning_undo_delete(aio_id),
+                                    className="ml-auto",
+                                ),
+                            ]
+                        ),
+                    ],
+                ),
+            ],
+            scrollable=True,
+            size="lg",
         )
 
     def _update_props(self, cancel_button_props, delete_button_props):
@@ -94,3 +197,29 @@ class DbcAdvancedOptionsAIO(html.Div):
         button_props["color"] = color
         button_props["style"] = style
         return button_props
+
+    @staticmethod
+    @callback(
+        Output(ids.warning_cancel_modal(MATCH), "is_open"),
+        Input(ids.cancel_button(MATCH), "n_clicks"),
+        Input(ids.warning_undo_cancel(MATCH), "n_clicks"),
+        State(ids.warning_cancel_modal(MATCH), "is_open"),
+        prevent_initial_call=True,
+    )
+    def toggle_warning_cancel_modal(
+        cancel_button_n_clicks, undo_cancel_button_n_clicks, is_open
+    ):
+        return not is_open
+
+    @staticmethod
+    @callback(
+        Output(ids.warning_delete_modal(MATCH), "is_open"),
+        Input(ids.delete_button(MATCH), "n_clicks"),
+        Input(ids.warning_undo_delete(MATCH), "n_clicks"),
+        State(ids.warning_delete_modal(MATCH), "is_open"),
+        prevent_initial_call=True,
+    )
+    def toggle_warning_delete_modal(
+        delete_button_n_clicks, undo_delete_button_n_clicks, is_open
+    ):
+        return not is_open
