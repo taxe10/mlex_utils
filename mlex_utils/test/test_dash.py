@@ -5,6 +5,12 @@ import pytest
 from dash._callback_context import context_value
 from dash._utils import AttributeDict
 
+from mlex_utils.dash_utils.components_bootstrap.advanced_options import (
+    DbcAdvancedOptionsAIO,
+)
+from mlex_utils.dash_utils.components_mantime.advanced_options import (
+    DmcAdvancedOptionsAIO,
+)
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 model_parameters = [
@@ -140,17 +146,11 @@ def test_get_parameters(component_type):
     assert isinstance(parameters_dict, dict) and params_errors is False
 
 
-@pytest.mark.parametrize("component_type", ["dbc"])
-def test_toggle_warnings(component_type):
-    if component_type == "dbc":
-        from mlex_utils.dash_utils.components_bootstrap.advanced_options import (
-            DbcAdvancedOptionsAIO as AdvancedOptionsAIO,
-        )
-    else:
-        from mlex_utils.dash_utils.components_mantime.advanced_options import (
-            DmcAdvancedOptionsAIO as AdvancedOptionsAIO,
-        )
+def test_toggle_warnings_dbc():
+    assert not DbcAdvancedOptionsAIO.toggle_warning_cancel_modal(0, 0, True)
+    assert DbcAdvancedOptionsAIO.toggle_warning_delete_modal(0, 0, False)
 
-    assert not AdvancedOptionsAIO.toggle_warning_cancel_modal(0, 0, True)
 
-    assert AdvancedOptionsAIO.toggle_warning_delete_modal(0, 0, False)
+def test_toggle_warnings_dmc():
+    assert not DmcAdvancedOptionsAIO.toggle_warning_cancel_modal(0, 0, 0, True)
+    assert DmcAdvancedOptionsAIO.toggle_warning_delete_modal(0, 0, 1, False)
