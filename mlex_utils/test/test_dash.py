@@ -1,6 +1,9 @@
 import uuid
+from contextvars import copy_context
 
 import pytest
+from dash._callback_context import context_value
+from dash._utils import AttributeDict
 
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
@@ -92,8 +95,37 @@ def test_get_job_manager(component_type):
     job_manager = mlex_components.get_job_manager()
     assert job_manager is not None
 
-    assert job_manager.toggle_modal(1, 0, False)
-    assert not job_manager.toggle_modal(0, 1, True)
+
+@pytest.mark.parametrize("component_type", ["dbc", "dmc"])
+def test_advanced_options_modal(component_type):
+    mlex_components = MLExComponents(component_type)
+    job_manager = mlex_components.get_job_manager()
+
+    def run_callback(n1, n2, is_open, train_job_id, inference_job_id, prop_id):
+        context_value.set(AttributeDict(**{"triggered_inputs": [{"prop_id": prop_id}]}))
+        return job_manager.toggle_modal(n1, n2, is_open, train_job_id, inference_job_id)
+
+    ctx = copy_context()
+
+    # Open advanced options modal with train job id
+    output = ctx.run(
+        run_callback, 1, 0, False, "uid0001", None, "train_button.n_clicks"
+    )
+    assert output[0] is True and output[1] == "uid0001"
+
+    # Close advanced options modal
+    output = ctx.run(run_callback, 0, 1, True, None, None, "train_button.n_clicks")
+    assert output[0] is False and output[1] is None
+
+    # Open advanced options modal with no inference job id
+    output = ctx.run(run_callback, 0, 1, False, None, None, "inference_button.n_clicks")
+    assert output[0] is True and output[1] is None
+
+    # Disable train advanced options modal button
+    assert not job_manager.disable_advanced_train_options("uid0001")
+
+    # Disable inference advanced options modal button
+    assert job_manager.disable_advanced_inference_options(None)
 
 
 @pytest.mark.parametrize("component_type", ["dbc", "dmc"])
@@ -106,3 +138,19 @@ def test_get_parameters(component_type):
     parameters = serialize_dash_components(parameters)
     parameters_dict, params_errors = mlex_components.get_parameters_values(parameters)
     assert isinstance(parameters_dict, dict) and params_errors is False
+
+
+@pytest.mark.parametrize("component_type", ["dbc"])
+def test_toggle_warnings(component_type):
+    if component_type == "dbc":
+        from mlex_utils.dash_utils.components_bootstrap.advanced_options import (
+            DbcAdvancedOptionsAIO as AdvancedOptionsAIO,
+        )
+    else:
+        from mlex_utils.dash_utils.components_mantime.advanced_options import (
+            DmcAdvancedOptionsAIO as AdvancedOptionsAIO,
+        )
+
+    assert not AdvancedOptionsAIO.toggle_warning_cancel_modal(0, 0, True)
+
+    assert AdvancedOptionsAIO.toggle_warning_delete_modal(0, 0, False)
