@@ -69,8 +69,22 @@ async def _set_state(
         await client.set_flow_run_state(flow_run_id, state, force=force)
 
 
+async def _get_flow_run_state(flow_run_id):
+    async with get_client() as client:
+        flow_run = await client.read_flow_run(flow_run_id)
+        return flow_run.state
+
+
+def get_flow_run_state(flow_run_id):
+    flow_run_state = asyncio.run(_get_flow_run_state(flow_run_id))
+    return flow_run_state.type
+
+
 def cancel_flow_run(flow_run_id: str):
-    asyncio.run(_set_state(flow_run_id, State(type=StateType.CANCELLED)))
+    flow_run_state = asyncio.run(_get_flow_run_state(flow_run_id))
+    if not flow_run_state.is_final():
+        asyncio.run(_set_state(flow_run_id, State(type=StateType.CANCELLED)))
+    pass
 
 
 async def _get_name(flow_run_id, is_completed):
@@ -87,7 +101,7 @@ async def _get_name(flow_run_id, is_completed):
 def get_flow_run_name(flow_run_id, is_completed=False):
     """
     Retrieves the name of the flow with the given id.
-    If is_completed is True, it will return the name of the flow only  if it is completed.
+    If is_completed is True, it will return the name of the flow only if it is completed.
     """
     return asyncio.run(_get_name(flow_run_id, is_completed))
 
@@ -112,7 +126,7 @@ async def _flow_run_query(
         return flow_runs
 
 
-async def read_flow_run_logs(flow_run_id, limit=200, offset=0):
+async def _read_flow_run_logs(flow_run_id, limit=200, offset=0):
     async with get_client() as client:
         flow_run_logs = await client.read_logs(
             log_filter=LogFilter(
@@ -154,5 +168,5 @@ def get_children_flow_run_ids(parent_flow_run_id, sort="START_TIME_ASC"):
 
 
 def get_flow_run_logs(flow_run_id):
-    flow_run_logs = asyncio.run(read_flow_run_logs(flow_run_id))
+    flow_run_logs = asyncio.run(_read_flow_run_logs(flow_run_id))
     return [log.message for log in flow_run_logs]
