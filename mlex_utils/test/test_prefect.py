@@ -2,6 +2,7 @@ import asyncio
 import uuid
 
 from prefect import context, flow, get_client
+from prefect.client.schemas.objects import StateType
 from prefect.deployments import Deployment
 from prefect.engine import create_then_begin_flow_run
 from prefect.testing.utilities import prefect_test_harness
@@ -12,6 +13,7 @@ from mlex_utils.prefect_utils.core import (
     get_children_flow_run_ids,
     get_flow_run_logs,
     get_flow_run_name,
+    get_flow_run_state,
     query_flow_runs,
     schedule_prefect_flow,
 )
@@ -110,13 +112,25 @@ def test_delete_prefect_flow_runs():
 
 def test_cancel_prefect_flow_runs():
     with prefect_test_harness():
-        # Run flow
-        flow_run_id = asyncio.run(run_flow())
-        assert isinstance(flow_run_id, str)
+        deployment = Deployment.build_from_flow(
+            flow=parent_flow,
+            name="test_deployment",
+            version="1",
+            tags=["Test tag"],
+        )
+        # Add deployment
+        deployment.apply()
 
-        # Get flow runs by name
-        flow_runs = query_flow_runs()
-        assert len(flow_runs) == 3
+        # Schedule parent flow
+        flow_run_id = schedule_prefect_flow(
+            deployment_name="Parent Flow/test_deployment",
+            parameters={"model_name": "model_name"},
+            flow_run_name="flow_run_name",
+        )
+
+        # Change flow run state
+        flow_run_state = get_flow_run_state(flow_run_id)
+        assert flow_run_state not in [StateType.COMPLETED, StateType.FAILED]
 
         # Cancel flow run
         cancel_flow_run(flow_run_id)
