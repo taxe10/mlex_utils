@@ -1,7 +1,7 @@
 import uuid
 
 import dash_mantine_components as dmc
-from dash import Dash, Input, Output, callback, html
+from dash import ALL, MATCH, Dash, Input, Output, callback, html
 from dash_iconify import DashIconify
 from models_utils import Models
 
@@ -16,7 +16,7 @@ from mlex_utils.dash_utils.components_mantime.component_utils import (
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
-def layout(job_manager, models):
+def layout(job_manager):
     """
     Returns the layout for the control panel in the app UI
     """
@@ -171,26 +171,7 @@ def layout(job_manager, models):
                             "carbon:ibm-watson-machine-learning",
                             "run-model",
                             id="model-configuration",
-                            children=[
-                                ControlItem(
-                                    "Model",
-                                    "model-selector",
-                                    dmc.Select(
-                                        id="model-list",
-                                        data=models.modelname_list,
-                                        value=(
-                                            models.modelname_list[0]
-                                            if models.modelname_list[0]
-                                            else None
-                                        ),
-                                        placeholder="Select a model...",
-                                    ),
-                                ),
-                                dmc.Space(h=15),
-                                html.Div(id="model-parameters"),
-                                dmc.Space(h=25),
-                                job_manager,
-                            ],
+                            children=job_manager,
                         ),
                     ],
                 ),
@@ -199,18 +180,18 @@ def layout(job_manager, models):
     )
 
 
-# Get MLExchange dash components
-mlex_components = MLExComponents("dmc")
-job_manager = mlex_components.get_job_manager()
-
 # Get models
 models = Models(modelfile_path="./examples/assets/models_dmc.json")
+
+# Get MLExchange dash components
+mlex_components = MLExComponents("dmc")
+job_manager = mlex_components.get_job_manager(model_list=models.modelname_list)
 
 app = Dash(__name__)
 app.layout = dmc.MantineProvider(
     theme={"colorScheme": "light"},
     children=[
-        layout(job_manager, models),
+        layout(job_manager),
         html.Div(
             id="model-params-out",
             style={"margin-left": "450px"},
@@ -220,8 +201,22 @@ app.layout = dmc.MantineProvider(
 
 
 @callback(
-    Output("model-parameters", "children"),
-    Input("model-list", "value"),
+    Output(
+        {
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "model_parameters",
+            "aio_id": MATCH,
+        },
+        "children",
+    ),
+    Input(
+        {
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "model_list",
+            "aio_id": MATCH,
+        },
+        "value",
+    ),
 )
 def update_model_parameters(model_name):
     model = models[model_name]
@@ -236,11 +231,19 @@ def update_model_parameters(model_name):
 
 @callback(
     Output("model-params-out", "children"),
-    Input("model-parameters", "children"),
+    Input(
+        {
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "model_parameters",
+            "aio_id": ALL,
+        },
+        "children",
+    ),
+    prevent_initial_call=True,
 )
 def update_model_parameters_output(model_parameter_container):
     model_parameters, parameter_errors = mlex_components.get_parameters_values(
-        model_parameter_container
+        model_parameter_container[0]
     )
     return str(model_parameters)
 

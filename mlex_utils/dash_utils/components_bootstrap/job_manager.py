@@ -103,10 +103,35 @@ class DbcJobManagerAIO(html.Div):
             "aio_id": aio_id,
         }
 
+        notifications_container = lambda aio_id: {  # noqa: E731
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "notifications_container",
+            "aio_id": aio_id,
+        }
+
+        model_parameters = lambda aio_id: {  # noqa: E731
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "model_parameters",
+            "aio_id": aio_id,
+        }
+
+        model_list_title = lambda aio_id: {  # noqa: E731
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "model_list_title",
+            "aio_id": aio_id,
+        }
+
+        model_list = lambda aio_id: {  # noqa: E731
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "model_list",
+            "aio_id": aio_id,
+        }
+
     ids = ids
 
     def __init__(
         self,
+        model_list=["Test Model"],
         prefect_tags=[],
         mode="dev",
         train_button_props=None,
@@ -117,6 +142,7 @@ class DbcJobManagerAIO(html.Div):
         """
         DbcJobManagerAIO is an All-in-One component that is composed
         of a parent `html.Div` with a button to train and infer a model.
+        - `model_list` - A list of models
         - `prefect_tags` - A list of tags used to filter Prefect flow runs.
         - `mode` - The mode of the component. If "dev", the component will display sample data.
         - `train_button_props` - A dictionary of properties passed into the Button component for the train button.
@@ -136,6 +162,17 @@ class DbcJobManagerAIO(html.Div):
 
         super().__init__(
             [
+                DbcControlItem(
+                    "Algorithm",
+                    self.ids.model_list_title(aio_id),
+                    dbc.Select(
+                        id=self.ids.model_list(aio_id),
+                        options=model_list,
+                        value=(model_list[0] if model_list[0] else None),
+                    ),
+                ),
+                html.Div(id=self.ids.model_parameters(aio_id)),
+                html.P(),
                 DbcControlItem(
                     "Name",
                     self.ids.job_name_title(aio_id),
@@ -219,6 +256,7 @@ class DbcJobManagerAIO(html.Div):
                 ),
                 html.Div(style={"height": "10px"}),
                 DbcAdvancedOptionsAIO(aio_id=aio_id),
+                html.Div(id=self.ids.notifications_container(aio_id)),
                 dcc.Interval(
                     id=self.ids.check_job(aio_id),
                     interval=5000,

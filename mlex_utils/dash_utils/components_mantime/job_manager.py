@@ -124,10 +124,35 @@ class DmcJobManagerAIO(html.Div):
             "aio_id": aio_id,
         }
 
+        notifications_container = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "notifications_container",
+            "aio_id": aio_id,
+        }
+
+        model_parameters = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "model_parameters",
+            "aio_id": aio_id,
+        }
+
+        model_list_title = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "model_list_title",
+            "aio_id": aio_id,
+        }
+
+        model_list = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "model_list",
+            "aio_id": aio_id,
+        }
+
     ids = ids
 
     def __init__(
         self,
+        model_list=["Test Model"],
         prefect_tags=[],
         mode="dev",
         train_button_props=None,
@@ -138,6 +163,7 @@ class DmcJobManagerAIO(html.Div):
         """
         DmcJobManagerAIO is an All-in-One component that is composed
         of a parent `html.Div` with a button to train and infer a model.
+        - `model_list` - A list of models
         - `prefect_tags` - A list of tags used to filter Prefect flow runs.
         - `mode` - The mode of the component. If "dev", the component will display sample data.
         - `train_button_props` - A dictionary of properties passed into the Button component for the train button.
@@ -157,6 +183,18 @@ class DmcJobManagerAIO(html.Div):
 
         super().__init__(
             [
+                DmcControlItem(
+                    "Algorithm",
+                    self.ids.model_list_title(aio_id),
+                    dmc.Select(
+                        id=self.ids.model_list(aio_id),
+                        data=model_list,
+                        value=(model_list[0] if model_list[0] else None),
+                    ),
+                ),
+                dmc.Space(h=15),
+                html.Div(id=self.ids.model_parameters(aio_id)),
+                dmc.Space(h=25),
                 DmcControlItem(
                     "Name",
                     self.ids.job_name_title(aio_id),
@@ -248,6 +286,7 @@ class DmcJobManagerAIO(html.Div):
                     ),
                 ),
                 DmcAdvancedOptionsAIO(aio_id=aio_id),
+                html.Div(id=self.ids.notifications_container(aio_id)),
                 dcc.Interval(
                     id=self.ids.check_job(aio_id),
                     interval=5000,

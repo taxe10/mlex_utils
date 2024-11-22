@@ -1,39 +1,18 @@
 import uuid
 
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, callback, html
+from dash import ALL, MATCH, Dash, Input, Output, callback, html
 from models_utils import Models
 
-from mlex_utils.dash_utils.components_bootstrap.component_utils import (
-    DbcControlItem as ControlItem,
-)
 from mlex_utils.dash_utils.components_bootstrap.component_utils import header
 from mlex_utils.dash_utils.mlex_components import MLExComponents
 
 
-def get_control_panel(job_manager, models):
-    model_list = [{"label": model, "value": model} for model in models.modelname_list]
+def get_control_panel(job_manager):
     control_panel = dbc.Accordion(
         [
             dbc.AccordionItem(
-                [
-                    ControlItem(
-                        "Algorithm",
-                        "select-algorithm",
-                        dbc.Select(
-                            id="model-list",
-                            options=model_list,
-                            value=(
-                                model_list[0]["value"]
-                                if model_list[0]["value"]
-                                else None
-                            ),
-                        ),
-                    ),
-                    html.Div(id="model-parameters"),
-                    html.P(),
-                    job_manager,
-                ],
+                job_manager,
                 title="Model Configuration",
             ),
         ],
@@ -42,12 +21,12 @@ def get_control_panel(job_manager, models):
     return control_panel
 
 
-# Get MLExchange dash components
-mlex_components = MLExComponents("dbc")
-job_manager = mlex_components.get_job_manager(mode="real")
-
 # Get models
 models = Models(modelfile_path="./examples/assets/models_dbc.json")
+
+# Get MLExchange dash components
+mlex_components = MLExComponents("dbc")
+job_manager = mlex_components.get_job_manager(model_list=models.modelname_list)
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Utils Example"
@@ -68,7 +47,7 @@ app.layout = html.Div(
                 dbc.Row(
                     [
                         dbc.Col(
-                            get_control_panel(job_manager, models),
+                            get_control_panel(job_manager),
                             style={
                                 "display": "flex",
                                 "margin-top": "1em",
@@ -100,8 +79,22 @@ app.layout = html.Div(
 
 
 @callback(
-    Output("model-parameters", "children"),
-    Input("model-list", "value"),
+    Output(
+        {
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "model_parameters",
+            "aio_id": MATCH,
+        },
+        "children",
+    ),
+    Input(
+        {
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "model_list",
+            "aio_id": MATCH,
+        },
+        "value",
+    ),
 )
 def update_model_parameters(model_name):
     model = models[model_name]
@@ -116,11 +109,19 @@ def update_model_parameters(model_name):
 
 @callback(
     Output("model-params-out", "children"),
-    Input("model-parameters", "children"),
+    Input(
+        {
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "model_parameters",
+            "aio_id": ALL,
+        },
+        "children",
+    ),
+    prevent_initial_call=True,
 )
 def update_model_parameters_output(model_parameter_container):
     model_parameters, parameter_errors = mlex_components.get_parameters_values(
-        model_parameter_container
+        model_parameter_container[0]
     )
     return str(model_parameters)
 
