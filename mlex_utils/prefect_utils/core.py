@@ -126,6 +126,12 @@ async def _flow_run_query(
         return flow_runs
 
 
+async def _read_flow_run(flow_run_id):
+    async with get_client() as client:
+        flow_run = await client.read_flow_run(flow_run_id)
+        return flow_run
+
+
 async def _read_flow_run_logs(flow_run_id, limit=200, offset=0):
     async with get_client() as client:
         flow_run_logs = await client.read_logs(
@@ -170,3 +176,8 @@ def get_children_flow_run_ids(parent_flow_run_id, sort="START_TIME_ASC"):
 def get_flow_run_logs(flow_run_id):
     flow_run_logs = asyncio.run(_read_flow_run_logs(flow_run_id))
     return [log.message for log in flow_run_logs]
+
+
+def get_flow_run_parameters(flow_run_id):
+    flow_run = asyncio.run(_read_flow_run(flow_run_id))
+    return flow_run.parameters

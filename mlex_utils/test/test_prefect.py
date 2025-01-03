@@ -13,6 +13,7 @@ from mlex_utils.prefect_utils.core import (
     get_children_flow_run_ids,
     get_flow_run_logs,
     get_flow_run_name,
+    get_flow_run_parameters,
     get_flow_run_state,
     query_flow_runs,
     schedule_prefect_flow,
@@ -151,3 +152,14 @@ def test_get_flow_run_logs():
         flow_run_logs = get_flow_run_logs(flow_run_id)
         assert len(flow_run_logs) > 0
         assert isinstance(flow_run_logs[0], str)
+
+
+def test_get_flow_run_parameters():
+    with prefect_test_harness():
+        # Run flow
+        flow_run_id = asyncio.run(run_flow())
+        assert isinstance(flow_run_id, str)
+
+        # Get flow run logs
+        flow_run_parameters = get_flow_run_parameters(flow_run_id)
+        assert isinstance(flow_run_parameters, dict)
