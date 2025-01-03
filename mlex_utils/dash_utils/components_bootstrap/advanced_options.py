@@ -10,67 +10,67 @@ class DbcAdvancedOptionsAIO(dbc.Modal):
 
         advanced_options_modal = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "advanced_options_modal",
+            "subcomponent": "advanced-options-modal",
             "aio_id": aio_id,
         }
 
         cancel_button = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "cancel_button",
+            "subcomponent": "cancel-button",
             "aio_id": aio_id,
         }
 
         delete_button = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "delete_button",
+            "subcomponent": "delete-button",
             "aio_id": aio_id,
         }
 
         logs_area = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "logs_area",
+            "subcomponent": "logs-area",
             "aio_id": aio_id,
         }
 
         job_id = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "job_id",
+            "subcomponent": "job-id",
             "aio_id": aio_id,
         }
 
         warning_delete_modal = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "warning_delete_modal",
+            "subcomponent": "warning-delete-modal",
             "aio_id": aio_id,
         }
 
         warning_cancel_modal = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "warning_cancel_modal",
+            "subcomponent": "warning-cancel-modal",
             "aio_id": aio_id,
         }
 
         warning_confirm_delete = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "warning_confirm_delete",
+            "subcomponent": "warning-confirm-delete",
             "aio_id": aio_id,
         }
 
         warning_confirm_cancel = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "warning_confirm_cancel",
+            "subcomponent": "warning-confirm-cancel",
             "aio_id": aio_id,
         }
 
         warning_undo_delete = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "warning_undo_delete",
+            "subcomponent": "warning-undo-delete",
             "aio_id": aio_id,
         }
 
         warning_undo_cancel = lambda aio_id: {  # noqa: E731
             "component": "DbcAdvancedOptionsAIO",
-            "subcomponent": "warning_undo_cancel",
+            "subcomponent": "warning-undo-cancel",
             "aio_id": aio_id,
         }
 

@@ -125,16 +125,16 @@ def test_advanced_options_modal(component_type):
 
     # Open advanced options modal with train job id
     output = ctx.run(
-        run_callback, 1, 0, False, "uid0001", None, "train_button.n_clicks"
+        run_callback, 1, 0, False, "uid0001", None, "train-button.n_clicks"
     )
     assert output[0] is True and output[1] == "uid0001"
 
     # Close advanced options modal
-    output = ctx.run(run_callback, 0, 1, True, None, None, "train_button.n_clicks")
+    output = ctx.run(run_callback, 0, 1, True, None, None, "train-button.n_clicks")
     assert output[0] is False and output[1] is None
 
     # Open advanced options modal with no inference job id
-    output = ctx.run(run_callback, 0, 1, False, None, None, "inference_button.n_clicks")
+    output = ctx.run(run_callback, 0, 1, False, None, None, "inference-button.n_clicks")
     assert output[0] is True and output[1] is None
 
     # Disable train advanced options modal button

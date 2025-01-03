@@ -33,97 +33,97 @@ class DbcJobManagerAIO(html.Div):
 
         job_name_title = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "job_name_title",
+            "subcomponent": "job-name-title",
             "aio_id": aio_id,
         }
 
         job_name = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "job_name",
+            "subcomponent": "job-name",
             "aio_id": aio_id,
         }
 
         train_button = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "train_button",
+            "subcomponent": "train-button",
             "aio_id": aio_id,
         }
 
         train_dropdown_title = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "train_dropdown_title",
+            "subcomponent": "train-dropdown-title",
             "aio_id": aio_id,
         }
 
         train_dropdown = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "train_dropdown",
+            "subcomponent": "train-dropdown",
             "aio_id": aio_id,
         }
 
         advanced_options_modal_train = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "advanced_options_modal_train",
+            "subcomponent": "advanced-options-modal-train",
             "aio_id": aio_id,
         }
 
         inference_button = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "inference_button",
+            "subcomponent": "inference-button",
             "aio_id": aio_id,
         }
 
         inference_dropdown_title = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "inference_dropdown_title",
+            "subcomponent": "inference-dropdown-title",
             "aio_id": aio_id,
         }
 
         inference_dropdown = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "inference_dropdown",
+            "subcomponent": "inference-dropdown",
             "aio_id": aio_id,
         }
 
         advanced_options_modal_inference = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "advanced_options_modal_inference",
+            "subcomponent": "advanced-options-modal-inference",
             "aio_id": aio_id,
         }
 
         check_job = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "check_job",
+            "subcomponent": "check-job",
             "aio_id": aio_id,
         }
 
         project_name_id = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "project_name_id",
+            "subcomponent": "project-name-id",
             "aio_id": aio_id,
         }
 
         notifications_container = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "notifications_container",
+            "subcomponent": "notifications-container",
             "aio_id": aio_id,
         }
 
         model_parameters = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "model_parameters",
+            "subcomponent": "model-parameters",
             "aio_id": aio_id,
         }
 
         model_list_title = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "model_list_title",
+            "subcomponent": "model-list-title",
             "aio_id": aio_id,
         }
 
         model_list = lambda aio_id: {  # noqa: E731
             "component": "DbcJobManagerAIO",
-            "subcomponent": "model_list",
+            "subcomponent": "model-list",
             "aio_id": aio_id,
         }
 
@@ -295,7 +295,7 @@ class DbcJobManagerAIO(html.Div):
             {
                 "aio_id": MATCH,
                 "component": "DbcAdvancedOptionsAIO",
-                "subcomponent": "advanced_options_modal",
+                "subcomponent": "advanced-options-modal",
             },
             "is_open",
         ),
@@ -303,7 +303,7 @@ class DbcJobManagerAIO(html.Div):
             {
                 "aio_id": MATCH,
                 "component": "DbcAdvancedOptionsAIO",
-                "subcomponent": "job_id",
+                "subcomponent": "job-id",
             },
             "data",
         ),
@@ -313,7 +313,7 @@ class DbcJobManagerAIO(html.Div):
             {
                 "aio_id": MATCH,
                 "component": "DbcAdvancedOptionsAIO",
-                "subcomponent": "advanced_options_modal",
+                "subcomponent": "advanced-options-modal",
             },
             "is_open",
         ),
@@ -376,7 +376,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "advanced_options_modal",
+                    "subcomponent": "advanced-options-modal",
                 },
                 "is_open",
                 allow_duplicate=True,
@@ -385,7 +385,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "warning_confirm_cancel",
+                    "subcomponent": "warning-confirm-cancel",
                 },
                 "n_clicks",
             ),
@@ -393,7 +393,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "job_id",
+                    "subcomponent": "job-id",
                 },
                 "data",
             ),
@@ -410,7 +410,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "advanced_options_modal",
+                    "subcomponent": "advanced-options-modal",
                 },
                 "is_open",
                 allow_duplicate=True,
@@ -419,7 +419,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "warning_confirm_delete",
+                    "subcomponent": "warning-confirm-delete",
                 },
                 "n_clicks",
             ),
@@ -427,7 +427,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "job_id",
+                    "subcomponent": "job-id",
                 },
                 "data",
             ),
@@ -446,7 +446,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "logs_area",
+                    "subcomponent": "logs-area",
                 },
                 "children",
             ),
@@ -454,7 +454,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "advanced_options_modal",
+                    "subcomponent": "advanced-options-modal",
                 },
                 "is_open",
             ),
@@ -463,7 +463,7 @@ class DbcJobManagerAIO(html.Div):
                 {
                     "aio_id": MATCH,
                     "component": "DbcAdvancedOptionsAIO",
-                    "subcomponent": "job_id",
+                    "subcomponent": "job-id",
                 },
                 "data",
             ),

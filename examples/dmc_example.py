@@ -204,7 +204,7 @@ app.layout = dmc.MantineProvider(
     Output(
         {
             "component": "DmcJobManagerAIO",
-            "subcomponent": "model_parameters",
+            "subcomponent": "model-parameters",
             "aio_id": MATCH,
         },
         "children",
@@ -212,7 +212,7 @@ app.layout = dmc.MantineProvider(
     Input(
         {
             "component": "DmcJobManagerAIO",
-            "subcomponent": "model_list",
+            "subcomponent": "model-list",
             "aio_id": MATCH,
         },
         "value",
@@ -234,7 +234,7 @@ def update_model_parameters(model_name):
     Input(
         {
             "component": "DmcJobManagerAIO",
-            "subcomponent": "model_parameters",
+            "subcomponent": "model-parameters",
             "aio_id": ALL,
         },
         "children",
