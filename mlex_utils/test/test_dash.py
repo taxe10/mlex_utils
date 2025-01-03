@@ -75,6 +75,16 @@ model_parameters = [
     },
 ]
 
+new_values = {
+    "float_param": 2.0,
+    "int_param": 2,
+    "str_param": "test2",
+    "slider": 50,
+    "dropdown": "option_1",
+    "radio": 2,
+    "bool": True,
+}
+
 
 def serialize_dash_components(obj):
     if hasattr(obj, "to_plotly_json"):
@@ -144,6 +154,26 @@ def test_get_parameters(component_type):
     parameters = serialize_dash_components(parameters)
     parameters_dict, params_errors = mlex_components.get_parameters_values(parameters)
     assert isinstance(parameters_dict, dict) and params_errors is False
+
+
+@pytest.mark.parametrize("component_type", ["dbc", "dmc"])
+def test_get_and_update_parameters(component_type):
+    mlex_components = MLExComponents(component_type)
+    parameters = mlex_components.get_parameter_items(
+        _id={"type": str(uuid.uuid4())}, json_blob=model_parameters
+    )
+    assert parameters is not None
+    parameters = serialize_dash_components(parameters)
+    parameters_dict, params_errors = mlex_components.get_parameters_values(parameters)
+    assert isinstance(parameters_dict, dict) and params_errors is False
+
+    new_parameters = mlex_components.update_parameters_values(parameters, new_values)
+    assert new_parameters is not None
+    new_parameters = serialize_dash_components(new_parameters)
+    new_parameters_dict, new_params_errors = mlex_components.get_parameters_values(
+        new_parameters
+    )
+    assert isinstance(new_parameters_dict, dict) and new_params_errors is False
 
 
 def test_toggle_warnings_dbc():

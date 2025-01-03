@@ -48,3 +48,27 @@ class MLExComponents:
                     errors = True
             input_params[key] = value
         return input_params, errors
+
+    # TODO: Consider changing the background of the components to indicate the change
+    @staticmethod
+    def update_parameters_values(current_parameters, new_values):
+        """
+        Updates the current parameters with the new values
+        """
+        parameters_children = current_parameters["props"].get("children", [])
+
+        for param in parameters_children:
+            # param["props"]["children"][1] is the container for the input
+            # The actual input props are at ["props"]["children"]["props"]
+            input_props = param["props"]["children"][1]["props"]["children"]["props"]
+            key = input_props["id"]["param_key"]
+
+            if key in new_values:
+                value = new_values[key]
+                # Update "value" if present, otherwise "checked"
+                if "value" in input_props:
+                    input_props["value"] = value
+                elif "checked" in input_props:
+                    input_props["checked"] = bool(value)
+
+        return current_parameters
