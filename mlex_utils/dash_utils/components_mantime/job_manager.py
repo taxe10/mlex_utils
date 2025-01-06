@@ -148,6 +148,18 @@ class DmcJobManagerAIO(html.Div):
             "aio_id": aio_id,
         }
 
+        show_training_stats = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "show-training-stats",
+            "aio_id": aio_id,
+        }
+
+        show_training_stats_title = lambda aio_id: {  # noqa: E731
+            "component": "DmcJobManagerAIO",
+            "subcomponent": "show-training-stats-title",
+            "aio_id": aio_id,
+        }
+
     ids = ids
 
     def __init__(
@@ -239,14 +251,16 @@ class DmcJobManagerAIO(html.Div):
                 ),
                 dmc.Space(h=25),
                 DmcControlItem(
-                    "Training Stats",
-                    self.ids.training_stats_title(aio_id),
-                    dmc.Anchor(
-                        dmc.Text("Open in new window"),
-                        id=self.ids.training_stats(aio_id),
-                        href="",
-                        target="_blank",
+                    "",
+                    self.ids.show_training_stats_title(aio_id),
+                    dmc.Button(
+                        "Show Training Stats",
+                        id=self.ids.show_training_stats(aio_id),
                         size="sm",
+                        radius="lg",
+                        color="gray",
+                        disabled=True,
+                        style={"width": "100%"},
                     ),
                 ),
                 dmc.Space(h=10),

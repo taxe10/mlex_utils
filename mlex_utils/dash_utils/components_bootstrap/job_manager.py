@@ -127,6 +127,18 @@ class DbcJobManagerAIO(html.Div):
             "aio_id": aio_id,
         }
 
+        show_training_stats = lambda aio_id: {  # noqa: E731
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "show-training-stats",
+            "aio_id": aio_id,
+        }
+
+        show_training_stats_title = lambda aio_id: {  # noqa: E731
+            "component": "DbcJobManagerAIO",
+            "subcomponent": "show-training-stats-title",
+            "aio_id": aio_id,
+        }
+
     ids = ids
 
     def __init__(
@@ -218,6 +230,18 @@ class DbcJobManagerAIO(html.Div):
                             className="g-1",
                         ),
                     ],
+                ),
+                html.Div(style={"height": "10px"}),
+                DbcControlItem(
+                    "",
+                    self.ids.show_training_stats_title(aio_id),
+                    dbc.Button(
+                        "Show Training Stats",
+                        id=self.ids.show_training_stats(aio_id),
+                        disabled=True,
+                        color="secondary",
+                        style={"width": "100%"},
+                    ),
                 ),
                 html.Div(style={"height": "10px"}),
                 dbc.Button(
