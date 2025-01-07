@@ -179,7 +179,9 @@ class DbcJobManagerAIO(html.Div):
                     self.ids.model_list_title(aio_id),
                     dbc.Select(
                         id=self.ids.model_list(aio_id),
-                        options=model_list,
+                        options=[
+                            {"label": model, "value": model} for model in model_list
+                        ],
                         value=(model_list[0] if model_list[0] else None),
                     ),
                 ),
