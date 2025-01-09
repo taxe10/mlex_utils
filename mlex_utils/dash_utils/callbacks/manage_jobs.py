@@ -5,6 +5,7 @@ from mlex_utils.prefect_utils.core import (
     delete_flow_run,
     get_flow_run_logs,
     get_flow_run_name,
+    get_flow_run_state,
     query_flow_runs,
 )
 
@@ -40,7 +41,7 @@ def _check_inference_job(train_job_id, project_name, prefect_tags, mode):
     if mode == "dev":
         return DEV_JOBS, no_update
     else:
-        if train_job_id is not None:
+        if train_job_id is not None and get_flow_run_state(train_job_id) == "COMPLETED":
             job_name = get_flow_run_name(train_job_id)
             if job_name is not None:
                 data = query_flow_runs(
