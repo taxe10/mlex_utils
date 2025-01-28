@@ -169,6 +169,7 @@ class DmcJobManagerAIO(html.Div):
         mode="dev",
         train_button_props=None,
         inference_button_props=None,
+        show_training_stats_button_props=None,
         modal_props=None,
         aio_id=None,
     ):
@@ -180,15 +181,34 @@ class DmcJobManagerAIO(html.Div):
         - `mode` - The mode of the component. If "dev", the component will display sample data.
         - `train_button_props` - A dictionary of properties passed into the Button component for the train button.
         - `inference_button_props` - A dictionary of properties passed into the Button component for the inference button.
+        - `show_training_stats_button_props` - A dictionary of properties passed into the Button component for the
+            show training stats button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
 
-        train_button_props = self._update_button_props(train_button_props)
-        inference_button_props = self._update_button_props(inference_button_props)
-        modal_props = self._update_modal_props(modal_props)
+        if train_button_props is None:
+            train_button_props = {
+                "variant": "light",
+                "style": {"width": "100%", "margin": "5px"},
+            }
+        if inference_button_props is None:
+            inference_button_props = {
+                "variant": "light",
+                "style": {"width": "100%", "margin": "5px"},
+            }
+        if show_training_stats_button_props is None:
+            show_training_stats_button_props = {
+                "size": "sm",
+                "radius": "lg",
+                "color": "gray",
+                "disabled": True,
+                "style": {"width": "100%"},
+            }
+        if modal_props is None:
+            modal_props = {"style": {"margin": "10px 10px 10px 250px"}}
 
         self._prefect_tags = prefect_tags
         self._mode = mode
@@ -256,11 +276,7 @@ class DmcJobManagerAIO(html.Div):
                     dmc.Button(
                         "Show Training Stats",
                         id=self.ids.show_training_stats(aio_id),
-                        size="sm",
-                        radius="lg",
-                        color="gray",
-                        disabled=True,
-                        style={"width": "100%"},
+                        **show_training_stats_button_props,
                     ),
                 ),
                 dmc.Space(h=10),
@@ -313,27 +329,6 @@ class DmcJobManagerAIO(html.Div):
         )
 
         self.register_callbacks()
-
-    def _update_button_props(
-        self, button_props, variant="light", style={"width": "100%", "margin": "5px"}
-    ):
-        button_props = button_props.copy() if button_props else {}
-        button_props["variant"] = (
-            variant if "variant" not in button_props else button_props["variant"]
-        )
-        button_props["style"] = (
-            style if "style" not in button_props else button_props["style"]
-        )
-        return button_props
-
-    def _update_modal_props(
-        self, modal_props, style={"margin": "10px 10px 10px 250px"}
-    ):
-        modal_props = modal_props.copy() if modal_props else {}
-        modal_props["style"] = (
-            style if "style" not in modal_props else modal_props["style"]
-        )
-        return modal_props
 
     @staticmethod
     @callback(
