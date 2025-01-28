@@ -102,7 +102,6 @@ class DbcJobManagerMinimalAIO(html.Div):
         run_button_props=None,
         modal_props=None,
         aio_id=None,
-        register_callbacks=True,
     ):
         """
         DbcJobManagerAIO is an All-in-One component that is composed
@@ -113,7 +112,6 @@ class DbcJobManagerMinimalAIO(html.Div):
         - `run_button_props` - A dictionary of properties passed into the Button component for the run button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
-        - `register_callbacks` - A boolean that determines if the component's callbacks should be registered.
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
@@ -123,6 +121,7 @@ class DbcJobManagerMinimalAIO(html.Div):
         if modal_props is None:
             modal_props = {"style": {}}
 
+        self._aio_id = aio_id
         self._prefect_tags = prefect_tags
         self._mode = mode
 
@@ -197,8 +196,7 @@ class DbcJobManagerMinimalAIO(html.Div):
             ]
         )
 
-        if register_callbacks:
-            self.register_callbacks()
+        self.register_callbacks()
 
     @staticmethod
     @callback(
@@ -246,8 +244,8 @@ class DbcJobManagerMinimalAIO(html.Div):
     def register_callbacks(self):
 
         @callback(
-            Output(self.ids.run_dropdown(MATCH), "options"),
-            Input(self.ids.check_job(MATCH), "n_intervals"),
+            Output(self.ids.run_dropdown(self._aio_id), "options"),
+            Input(self.ids.check_job(self._aio_id), "n_intervals"),
         )
         def check_run_job(n_intervals):
             return _check_train_job(self._prefect_tags, self._mode)
@@ -255,7 +253,7 @@ class DbcJobManagerMinimalAIO(html.Div):
         @callback(
             Output(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "advanced-options-modal",
                 },
@@ -264,7 +262,7 @@ class DbcJobManagerMinimalAIO(html.Div):
             ),
             Input(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "warning-confirm-cancel",
                 },
@@ -272,7 +270,7 @@ class DbcJobManagerMinimalAIO(html.Div):
             ),
             State(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "job-id",
                 },
@@ -285,10 +283,10 @@ class DbcJobManagerMinimalAIO(html.Div):
             return False
 
         @callback(
-            Output(self.ids.run_dropdown(MATCH), "value", allow_duplicate=True),
+            Output(self.ids.run_dropdown(self._aio_id), "value", allow_duplicate=True),
             Output(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "advanced-options-modal",
                 },
@@ -297,7 +295,7 @@ class DbcJobManagerMinimalAIO(html.Div):
             ),
             Input(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "warning-confirm-delete",
                 },
@@ -305,13 +303,13 @@ class DbcJobManagerMinimalAIO(html.Div):
             ),
             State(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "job-id",
                 },
                 "data",
             ),
-            State(self.ids.run_dropdown(MATCH), "value"),
+            State(self.ids.run_dropdown(self._aio_id), "value"),
             prevent_initial_call=True,
         )
         def delete_job(n_clicks, job_id, run_job_id):
@@ -321,7 +319,7 @@ class DbcJobManagerMinimalAIO(html.Div):
         @callback(
             Output(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "logs-area",
                 },
@@ -329,16 +327,16 @@ class DbcJobManagerMinimalAIO(html.Div):
             ),
             Input(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "advanced-options-modal",
                 },
                 "is_open",
             ),
-            Input(self.ids.check_job(MATCH), "n_intervals"),
+            Input(self.ids.check_job(self._aio_id), "n_intervals"),
             State(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DbcAdvancedOptionsAIO",
                     "subcomponent": "job-id",
                 },

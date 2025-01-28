@@ -111,7 +111,6 @@ class DmcJobManagerMinimalAIO(html.Div):
         run_button_props=None,
         modal_props=None,
         aio_id=None,
-        register_callbacks=True,
     ):
         """
         DmcJobManagerAIO is an All-in-One component that is composed
@@ -122,7 +121,6 @@ class DmcJobManagerMinimalAIO(html.Div):
         - `run_button_props` - A dictionary of properties passed into the Button component for the run button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
-        - `register_callbacks` - A boolean that determines if the component should register its callbacks.
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
@@ -136,6 +134,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         if modal_props is None:
             modal_props = {"style": {"margin": "10px 10px 10px 250px"}}
 
+        self._aio_id = aio_id
         self._prefect_tags = prefect_tags
         self._mode = mode
 
@@ -207,8 +206,7 @@ class DmcJobManagerMinimalAIO(html.Div):
             ]
         )
 
-        if register_callbacks:
-            self.register_callbacks()
+        self.register_callbacks()
 
     @staticmethod
     @callback(
@@ -256,8 +254,8 @@ class DmcJobManagerMinimalAIO(html.Div):
     def register_callbacks(self):
 
         @callback(
-            Output(self.ids.run_dropdown(MATCH), "data"),
-            Input(self.ids.check_job(MATCH), "n_intervals"),
+            Output(self.ids.run_dropdown(self._aio_id), "data"),
+            Input(self.ids.check_job(self._aio_id), "n_intervals"),
         )
         def check_run_job(n_intervals):
             return _check_train_job(self._prefect_tags, self._mode)
@@ -265,7 +263,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         @callback(
             Output(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "advanced-options-modal",
                 },
@@ -274,7 +272,7 @@ class DmcJobManagerMinimalAIO(html.Div):
             ),
             Input(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "warning-confirm-cancel",
                 },
@@ -282,7 +280,7 @@ class DmcJobManagerMinimalAIO(html.Div):
             ),
             State(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "job-id",
                 },
@@ -295,10 +293,10 @@ class DmcJobManagerMinimalAIO(html.Div):
             return False
 
         @callback(
-            Output(self.ids.run_dropdown(MATCH), "value", allow_duplicate=True),
+            Output(self.ids.run_dropdown(self._aio_id), "value", allow_duplicate=True),
             Output(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "advanced-options-modal",
                 },
@@ -307,7 +305,7 @@ class DmcJobManagerMinimalAIO(html.Div):
             ),
             Input(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "warning-confirm-delete",
                 },
@@ -315,13 +313,13 @@ class DmcJobManagerMinimalAIO(html.Div):
             ),
             State(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "job-id",
                 },
                 "data",
             ),
-            State(self.ids.run_dropdown(MATCH), "value"),
+            State(self.ids.run_dropdown(self._aio_id), "value"),
             prevent_initial_call=True,
         )
         def delete_job(n_clicks, job_id, run_job_id):
@@ -331,7 +329,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         @callback(
             Output(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "logs-area",
                 },
@@ -339,16 +337,16 @@ class DmcJobManagerMinimalAIO(html.Div):
             ),
             Input(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "advanced-options-modal",
                 },
                 "opened",
             ),
-            Input(self.ids.check_job(MATCH), "n_intervals"),
+            Input(self.ids.check_job(self._aio_id), "n_intervals"),
             State(
                 {
-                    "aio_id": MATCH,
+                    "aio_id": self._aio_id,
                     "component": "DmcAdvancedOptionsAIO",
                     "subcomponent": "job-id",
                 },
