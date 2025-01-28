@@ -1,13 +1,40 @@
-from mlex_utils.dash_utils.components_bootstrap.job_manager import DbcJobManagerAIO
-from mlex_utils.dash_utils.components_bootstrap.parameter_items import DbcParameterItems
-from mlex_utils.dash_utils.components_mantime.job_manager import DmcJobManagerAIO
-from mlex_utils.dash_utils.components_mantime.parameter_items import DmcParameterItems
+import importlib
+
+UI_STYLE_IMPLEMENTATIONS = {
+    "dbc": {
+        "job_manager": "mlex_utils.dash_utils.components_bootstrap.job_manager.DbcJobManagerAIO",
+        "job_manager_minimal": (
+            "mlex_utils.dash_utils.components_bootstrap."
+            "job_manager_minimal.DbcJobManagerMinimalAIO"
+        ),
+        "parameter_items": (
+            "mlex_utils.dash_utils.components_bootstrap.parameter_items."
+            "DbcParameterItems"
+        ),
+    },
+    "dmc": {
+        "job_manager": "mlex_utils.dash_utils.components_mantime.job_manager.DmcJobManagerAIO",
+        "job_manager_minimal": (
+            "mlex_utils.dash_utils.components_mantime."
+            "job_manager_minimal.DmcJobManagerMinimalAIO"
+        ),
+        "parameter_items": (
+            "mlex_utils.dash_utils.components_mantime.parameter_items."
+            "DmcParameterItems"
+        ),
+    },
+}
+
+
+def import_from_path(import_path: str):
+    """Dynamically import a class/function given its full import path."""
+    module_path, attr_name = import_path.rsplit(".", 1)
+    module = importlib.import_module(module_path)
+    return getattr(module, attr_name)
 
 
 class MLExComponents:
     ALLOWED_UI_STYLES = {"dbc", "dmc"}
-    JOB_MANAGER_CLASSES = {"dbc": DbcJobManagerAIO, "dmc": DmcJobManagerAIO}
-    PARAMETER_ITEMS_CLASSES = {"dbc": DbcParameterItems, "dmc": DmcParameterItems}
 
     def __init__(self, ui_style):
         if ui_style not in self.ALLOWED_UI_STYLES:
@@ -17,12 +44,19 @@ class MLExComponents:
         self.ui_style = ui_style
 
     def get_job_manager(self, **kwargs):
-        job_manager_class = self.JOB_MANAGER_CLASSES[self.ui_style]
-        return job_manager_class(**kwargs)
+        path = UI_STYLE_IMPLEMENTATIONS[self.ui_style]["job_manager"]
+        cls = import_from_path(path)
+        return cls(**kwargs)
+
+    def get_job_manager_minimal(self, **kwargs):
+        path = UI_STYLE_IMPLEMENTATIONS[self.ui_style]["job_manager_minimal"]
+        cls = import_from_path(path)
+        return cls(**kwargs)
 
     def get_parameter_items(self, **kwargs):
-        parameter_items_class = self.PARAMETER_ITEMS_CLASSES[self.ui_style]
-        return parameter_items_class(**kwargs)
+        path = UI_STYLE_IMPLEMENTATIONS[self.ui_style]["parameter_items"]
+        cls = import_from_path(path)
+        return cls(**kwargs)
 
     @staticmethod
     def get_parameters_values(parameters):

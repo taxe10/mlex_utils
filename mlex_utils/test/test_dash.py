@@ -113,6 +113,13 @@ def test_get_job_manager(component_type):
 
 
 @pytest.mark.parametrize("component_type", ["dbc", "dmc"])
+def test_get_job_manager_minimal(component_type):
+    mlex_components = MLExComponents(component_type)
+    job_manager = mlex_components.get_job_manager_minimal()
+    assert job_manager is not None
+
+
+@pytest.mark.parametrize("component_type", ["dbc", "dmc"])
 def test_advanced_options_modal(component_type):
     mlex_components = MLExComponents(component_type)
     job_manager = mlex_components.get_job_manager()
