@@ -111,6 +111,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         run_button_props=None,
         modal_props=None,
         aio_id=None,
+        register_callbacks=True,
     ):
         """
         DmcJobManagerAIO is an All-in-One component that is composed
@@ -121,6 +122,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         - `run_button_props` - A dictionary of properties passed into the Button component for the run button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
+        - `register_callbacks` - A boolean that determines if the component should register its callbacks.
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
@@ -205,7 +207,8 @@ class DmcJobManagerMinimalAIO(html.Div):
             ]
         )
 
-        self.register_callbacks()
+        if register_callbacks:
+            self.register_callbacks()
 
     @staticmethod
     @callback(

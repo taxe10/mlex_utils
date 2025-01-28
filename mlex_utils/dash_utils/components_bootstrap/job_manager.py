@@ -151,6 +151,7 @@ class DbcJobManagerAIO(html.Div):
         show_training_stats_button_props=None,
         modal_props=None,
         aio_id=None,
+        register_callbacks=True,
     ):
         """
         DbcJobManagerAIO is an All-in-One component that is composed
@@ -164,6 +165,7 @@ class DbcJobManagerAIO(html.Div):
             show training stats button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
+        - `register_callbacks` - A boolean that determines if the component should register its callbacks.
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
@@ -304,7 +306,8 @@ class DbcJobManagerAIO(html.Div):
             ]
         )
 
-        self.register_callbacks()
+        if register_callbacks:
+            self.register_callbacks()
 
     @staticmethod
     @callback(
