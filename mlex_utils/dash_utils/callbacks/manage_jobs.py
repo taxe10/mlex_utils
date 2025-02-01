@@ -16,6 +16,14 @@ DEV_JOBS = [
 ]
 
 
+def _check_job(prefect_tags, mode):
+    if mode == "dev":
+        data = DEV_JOBS
+    else:
+        data = query_flow_runs(tags=prefect_tags)
+    return data
+
+
 def _check_train_job(prefect_tags, mode):
     """
     This callback populates the train job selector dropdown with job names and ids from Prefect.
@@ -23,11 +31,23 @@ def _check_train_job(prefect_tags, mode):
     This callback displays the current status of the job as part of the job name in the dropdown.
     In "dev" mode, the dropdown is populated with the sample data above.
     """
+    return _check_job(prefect_tags + ["train"], mode)
+
+
+def _check_dependent_job(job_id, project_name, prefect_tags, mode):
     if mode == "dev":
-        data = DEV_JOBS
+        return DEV_JOBS, no_update
     else:
-        data = query_flow_runs(tags=prefect_tags + ["train"])
-    return data
+        if job_id is not None and get_flow_run_state(job_id) == "COMPLETED":
+            job_name = get_flow_run_name(job_id)
+            if job_name is not None:
+                data = query_flow_runs(
+                    flow_run_name=job_name,
+                    tags=prefect_tags.append(project_name),
+                )
+                selected_value = None if len(data) == 0 else no_update
+            return data, selected_value
+        return [], None
 
 
 def _check_inference_job(train_job_id, project_name, prefect_tags, mode):
@@ -38,19 +58,9 @@ def _check_inference_job(train_job_id, project_name, prefect_tags, mode):
     This callback displays the current status of the job as part of the job name in the dropdown.
     In "dev" mode, the dropdown is populated with the sample data above.
     """
-    if mode == "dev":
-        return DEV_JOBS, no_update
-    else:
-        if train_job_id is not None and get_flow_run_state(train_job_id) == "COMPLETED":
-            job_name = get_flow_run_name(train_job_id)
-            if job_name is not None:
-                data = query_flow_runs(
-                    flow_run_name=job_name,
-                    tags=prefect_tags + [project_name, "inference"],
-                )
-                selected_value = None if len(data) == 0 else no_update
-            return data, selected_value
-        return [], None
+    return _check_dependent_job(
+        train_job_id, project_name, prefect_tags + ["inference"], mode
+    )
 
 
 def _get_job_logs(job_id, mode):

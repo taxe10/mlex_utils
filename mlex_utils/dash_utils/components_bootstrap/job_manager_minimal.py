@@ -6,7 +6,8 @@ from dash_iconify import DashIconify
 
 from mlex_utils.dash_utils.callbacks.manage_jobs import (
     _cancel_job,
-    _check_train_job,
+    _check_dependent_job,
+    _check_job,
     _delete_job,
     _get_job_logs,
 )
@@ -102,6 +103,7 @@ class DbcJobManagerMinimalAIO(html.Div):
         run_button_props=None,
         modal_props=None,
         aio_id=None,
+        dependency_id=None,
     ):
         """
         DbcJobManagerAIO is an All-in-One component that is composed
@@ -112,6 +114,8 @@ class DbcJobManagerMinimalAIO(html.Div):
         - `run_button_props` - A dictionary of properties passed into the Button component for the run button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
+        - `dependency_id` - Check list of jobs that are dependent on the completion of the job of this component id
+                            (dropdown).
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
@@ -124,6 +128,7 @@ class DbcJobManagerMinimalAIO(html.Div):
         self._aio_id = aio_id
         self._prefect_tags = prefect_tags
         self._mode = mode
+        self._dependency_id = dependency_id
 
         super().__init__(
             [
@@ -244,13 +249,6 @@ class DbcJobManagerMinimalAIO(html.Div):
     def register_callbacks(self):
 
         @callback(
-            Output(self.ids.run_dropdown(self._aio_id), "options"),
-            Input(self.ids.check_job(self._aio_id), "n_intervals"),
-        )
-        def check_run_job(n_intervals):
-            return _check_train_job(self._prefect_tags, self._mode)
-
-        @callback(
             Output(
                 {
                     "aio_id": self._aio_id,
@@ -348,3 +346,30 @@ class DbcJobManagerMinimalAIO(html.Div):
             if job_id is None:
                 return "No logs available"
             return _get_job_logs(job_id, self._mode)
+
+        if self._dependency_id is not None:
+
+            @callback(
+                Output(
+                    self.ids.run_dropdown(self._aio_id), "options", allow_duplicate=True
+                ),
+                Output(self.ids.run_dropdown(self._aio_id), "value"),
+                Input(self.ids.check_job(self._aio_id), "n_intervals"),
+                Input(self._dependency_id, "value"),
+                State(self.ids.project_name_id(self._aio_id), "data"),
+                prevent_initial_call=True,
+            )
+            def check_dependent_job(n_intervals, dependent_job_id, project_name):
+                jobs = _check_dependent_job(
+                    dependent_job_id, project_name, self._prefect_tags, self._mode
+                )
+                return jobs
+
+        else:
+
+            @callback(
+                Output(self.ids.run_dropdown(self._aio_id), "options"),
+                Input(self.ids.check_job(self._aio_id), "n_intervals"),
+            )
+            def check_run_job(n_intervals):
+                return _check_job(self._prefect_tags, self._mode)

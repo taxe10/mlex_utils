@@ -6,6 +6,7 @@ from dash_iconify import DashIconify
 
 from mlex_utils.dash_utils.callbacks.manage_jobs import (
     _cancel_job,
+    _check_inference_job,
     _check_train_job,
     _delete_job,
     _get_job_logs,
@@ -111,6 +112,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         run_button_props=None,
         modal_props=None,
         aio_id=None,
+        dependency=None,
     ):
         """
         DmcJobManagerAIO is an All-in-One component that is composed
@@ -121,6 +123,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         - `run_button_props` - A dictionary of properties passed into the Button component for the run button.
         - `modal_props` - A dictionary of properties passed into the Modal component for the advanced options modal.
         - `aio_id` - The All-in-One component ID used to generate the markdown and dropdown components's dictionary IDs.
+        - `dependency` - List of jobs is dependent on the completion of the value of this component (dropdown).
         """
         if aio_id is None:
             aio_id = str(uuid.uuid4())
@@ -137,6 +140,7 @@ class DmcJobManagerMinimalAIO(html.Div):
         self._aio_id = aio_id
         self._prefect_tags = prefect_tags
         self._mode = mode
+        self._dependency = dependency
 
         super().__init__(
             [
@@ -358,3 +362,20 @@ class DmcJobManagerMinimalAIO(html.Div):
             if job_id is None:
                 return "No logs available"
             return _get_job_logs(job_id, self._mode)
+
+        if self._dependency:
+
+            @callback(
+                Output(
+                    self.ids.run_dropdown(self._aio_id), "data", allow_duplicate=True
+                ),
+                Output(self.ids.run_dropdown(self._aio_id), "value"),
+                Input(self.ids.check_job(self._aio_id), "n_intervals"),
+                Input(self._dependency, "value"),
+                State(self.ids.project_name_id(self._aio_id), "data"),
+                prevent_initial_call=True,
+            )
+            def check_dependant_job(n_intervals, dependant_job_id, project_name):
+                return _check_inference_job(
+                    dependant_job_id, project_name, self._prefect_tags, self._mode
+                )
